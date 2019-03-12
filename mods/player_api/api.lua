@@ -40,12 +40,18 @@ function player_api.set_model(player, model_name)
 		if player_model[name] == model_name then
 			return
 		end
+		local c = model.collisionbox or {-0.3, -1, -0.3, 0.3, 0.75, 0.3}
+
+		if c[2] > -0.5 then
+			c = {c[1], c[2] - 1, c[3], c[4], c[5] - 1, c[6]}
+		end
+
 		player:set_properties({
 			mesh = model_name,
 			textures = player_textures[name] or model.textures,
 			visual = "mesh",
 			visual_size = model.visual_size or {x = 1, y = 1},
-			collisionbox = model.collisionbox or {-0.3, 0.0, -0.3, 0.3, 1.7, 0.3},
+			collisionbox = c,
 			stepheight = model.stepheight or 0.6,
 			eye_height = model.eye_height or 1.47,
 		})
@@ -54,7 +60,7 @@ function player_api.set_model(player, model_name)
 		player:set_properties({
 			textures = {"player.png", "player_back.png"},
 			visual = "upright_sprite",
-			collisionbox = {-0.3, 0.0, -0.3, 0.3, 1.75, 0.3},
+			collisionbox = {-0.3, -1.0, -0.3, 0.3, 0.75, 0.3},
 			stepheight = 0.6,
 			eye_height = 1.625,
 		})
