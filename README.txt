@@ -1,7 +1,6 @@
-Minetest Game [minetest_game]
-=============================
+# Minetest4 Game
+
 The main game for the Minetest engine
-=====================================
 
 To use this game with the Minetest engine, insert this repository as
 	/games/minetest_game
@@ -11,16 +10,15 @@ The Minetest engine can be found in:
 
 Compatibility
 --------------
-The Minetest Game github master HEAD is generally compatible with the github
-master HEAD of the Minetest engine.
 
-Additionally, when the Minetest engine is tagged to be a certain version (eg.
-0.4.10), Minetest Game is tagged with the version too.
+This source code and files are only compatible with matched minetest4 engine
+from https://codeberg.org/minenux/minetest-engine/src/branch/stable-4.0 
+Additionally, when the Minetest4 engine is tagged to be a certain version (e.g.
+4.0.18), Minetest Game is tagged with the version 4.0.18 too.
 
-When stable releases are made, Minetest Game is packaged and made available in
-	http://minetest.net/downloads/
-and in case the repository has grown too much, it may be reset. In that sense,
-this is not a "real" git repository. (Package maintainers please note!)
+When stable releases are made, Minetest Game and the Minetest engine is packaged 
+and made available at https://codeberg.org/minenux/minetest-engine/archive/stable-4.0.tar.gz 
+or generally at https://codeberg.org/minenux/minetest-engine/releases/tag/4.0.18 by example.
 
 Licensing
 ---------
