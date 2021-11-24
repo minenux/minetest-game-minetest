@@ -229,12 +229,16 @@ local function add_effects(pos, radius, drops)
 	-- we just dropped some items. Look at the items entities and pick
 	-- one of them to use as texture
 	local texture = "tnt_blast.png" --fallback texture
+	local node
 	local most = 0
 	for name, stack in pairs(drops) do
 		local count = stack:get_count()
 		if count > most then
 			most = count
 			local def = minetest.registered_nodes[name]
+			if def then
+				node = { name = name }
+			end
 			if def and def.tiles and def.tiles[1] then
 				texture = def.tiles[1]
 			end
@@ -252,9 +256,11 @@ local function add_effects(pos, radius, drops)
 		maxacc = {x = 0, y = -10, z = 0},
 		minexptime = 0.8,
 		maxexptime = 2.0,
-		minsize = radius * 0.66,
-		maxsize = radius * 2,
+		minsize = radius * 0.33,
+		maxsize = radius,
 		texture = texture,
+		-- ^ only as fallback for clients without support for `node` parameter
+		node = node,
 		collisiondetection = true,
 	})
 end
@@ -283,10 +289,15 @@ local function tnt_explode(pos, radius, ignore_protection, ignore_on_blast, owne
 	local a = VoxelArea:new({MinEdge = minp, MaxEdge = maxp})
 	local data = vm1:get_data()
 	local count = 0
-	local c_tnt = minetest.get_content_id("tnt:tnt")
+	local c_tnt
 	local c_tnt_burning = minetest.get_content_id("tnt:tnt_burning")
 	local c_tnt_boom = minetest.get_content_id("tnt:boom")
 	local c_air = minetest.get_content_id("air")
+	if enable_tnt then
+		c_tnt = minetest.get_content_id("tnt:tnt")
+	else
+		c_tnt = c_tnt_burning -- tnt is not registered if disabled
+	end
 	-- make sure we still have explosion even when centre node isnt tnt related
 	if explode_center then
 		count = 1
