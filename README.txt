@@ -1,28 +1,36 @@
 Minetest Game [minetest_game]
 =============================
-The main subgame for the Minetest engine
-========================================
 
-To use this subgame with the Minetest engine, insert this repository as
-	/games/minetest_game
+The main and default (sub)game for the Minetest engine
 
-The Minetest engine can be found in:
-	https://github.com/minetest/minetest/
+For further information, check 
+[this forum topic](https://forum.minetest.net/viewtopic.php?f=15&t=9724).   
+Also see the [Minetest Wiki](https://wiki.minetest.net/Subgames/Minetest_Game) 
+for more information.
 
-Compatibility
---------------
-The Minetest Game github master HEAD is generally compatible with the github
-master HEAD of the Minetest engine.
+## Installation
+---------------
 
-Additionally, when the Minetest engine is tagged to be a certain version (eg.
-0.4.10), Minetest Game is tagged with the version too.
+* clone or download this repository or game tarball
+* Unzip the archive, 
+* rename the directory to `minetest` 
+* and place it in .. `<SHAREDIR>/minetest/games/` if you use a system-wide installation
+* or place it in `~/.minetest/games/` of your home.
 
-When stable releases are made, Minetest Game is packaged and made available in
-	http://minetest.net/download
-and in case the repository has grown too much, it may be reset. In that sense,
-this is not a "real" git repository. (Package maintainers please note!)
+## Compatibility
+----------------
 
-Licensing
----------
+This source code and files are only compatible with matched minetest older engine
+from https://codeberg.org/minenux/minetest-engine/src/branch/stable-0.4 
+Additionally, when the Minetest4 engine is tagged to be a certain version (e.g.
+0.4.17.1), Minetest Game is tagged with the version 0.4.17.1 too.
 
-See LICENSE.txt
+When stable releases are made, Minetest Game and the Minetest engine is packaged 
+and made available at https://codeberg.org/minenux/minetest-engine/archive/stable-0.4.tar.gz 
+or generally at https://codeberg.org/minenux/minetest-engine/releases/tag/0.4.17.3 by example.
+
+## Licensing
+------------
+
+See `LICENSE.txt`
+
