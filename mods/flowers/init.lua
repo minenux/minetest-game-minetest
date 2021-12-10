@@ -214,19 +214,28 @@ function flowers.mushroom_spread(pos, node)
 		minetest.remove_node(pos)
 		return
 	end
-	local positions = minetest.find_nodes_in_area_under_air(
-		{x = pos.x - 1, y = pos.y - 2, z = pos.z - 1},
-		{x = pos.x + 1, y = pos.y + 1, z = pos.z + 1},
-		{"group:soil", "group:tree"})
-	if #positions == 0 then
-		return
+	local random = {
+	    x = pos.x + math.random(-2, 2),
+	    y = pos.y + math.random(-1, 1),
+	    z = pos.z + math.random(-2, 2)
+	}
+	local random_node = minetest.get_node_or_nil(random)
+	if not random_node or random_node.name ~= "air" then
+	    return
 	end
-	local pos2 = positions[math.random(#positions)]
-	pos2.y = pos2.y + 1
-	if minetest.get_node_light(pos, 0.5) <= 3 and
-			minetest.get_node_light(pos2, 0.5) <= 3 then
-		minetest.set_node(pos2, {name = node.name})
+	local node_under = minetest.get_node_or_nil({x = random.x,
+	    y = random.y - 1, z = random.z})
+	if not node_under then
+	    return
 	end
+
+	if (minetest.get_item_group(node_under.name, "soil") ~= 0 or
+		minetest.get_item_group(node_under.name, "tree") ~= 0) and
+		minetest.get_node_light(pos, 0.5) <= 3 and
+		minetest.get_node_light(random, 0.5) <= 3 then
+	    minetest.set_node(random, {name = node.name})
+	end
+
 end
 
 minetest.register_abm({
