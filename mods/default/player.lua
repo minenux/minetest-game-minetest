@@ -27,6 +27,7 @@ default.player_register_model("character.b3d", {
 		walk_mine = { x=200, y=219, },
 		sit       = { x= 81, y=160, },
 	},
+	eye_height = 1.625,
 })
 
 -- Player stats and animations
@@ -58,12 +59,14 @@ function default.player_set_model(player, model_name)
 			textures = player_textures[name] or model.textures,
 			visual = "mesh",
 			visual_size = model.visual_size or {x=1, y=1},
+			eye_height = model.eye_height or 1.47,
 		})
 		default.player_set_animation(player, "stand")
 	else
 		player:set_properties({
 			textures = { "player.png", "player_back.png", },
 			visual = "upright_sprite",
+			eye_height = 1.625,
 		})
 	end
 	player_model[name] = model_name

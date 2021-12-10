@@ -645,6 +645,7 @@ default.player_get_animation(player)
 			bar = {x = 20, y = 39},
 		-- ...
 		},
+		eye_height = 1.47, -- In nodes above feet position
 	}
 
 Leafdecay
