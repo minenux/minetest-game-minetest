@@ -1,14 +1,16 @@
 local stuff_string = minetest.settings:get("initial_stuff") or
-		"default:pick_steel,default:axe_steel,default:shovel_steel," ..
-		"default:torch 99,default:cobble 99"
+		"default:wood 2,farming:bread 2,default:furnace 1," ..
+		"default:torch 5"
+
+local modname = "give_initial_stuff"
+local modlogn = "["..modname.."]"
 
 give_initial_stuff = {
 	items = {}
 }
 
 function give_initial_stuff.give(player)
-	minetest.log("action",
-			"Giving initial stuff to player " .. player:get_player_name())
+	minetest.log("action",modlogn.." Giving initial stuff to player " .. player:get_player_name())
 	local inv = player:get_inventory()
 	for _, stack in ipairs(give_initial_stuff.items) do
 		inv:add_item("main", stack)
@@ -42,3 +44,4 @@ give_initial_stuff.add_from_csv(stuff_string)
 if minetest.settings:get_bool("give_initial_stuff") then
 	minetest.register_on_newplayer(give_initial_stuff.give)
 end
+

@@ -21,7 +21,7 @@ enable_lavacooling (Lavacooling) bool true
 
 #    If enabled, steel tools, torches and cobblestone will be given to new
 #    players.
-give_initial_stuff (Give initial items) bool false
+give_initial_stuff (Give initial items) bool true
 
 #    If enabled, players respawn at the bed they last lay on instead of normal
 #    spawn.
