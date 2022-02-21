@@ -1,3 +1,8 @@
+-- boats/init.lua
+
+-- Load support for MT game translation.
+local S = minetest.get_translator("boats")
+
 --
 -- Helper functions
 --
@@ -5,15 +10,6 @@
 local function is_water(pos)
 	local nn = minetest.get_node(pos).name
 	return minetest.get_item_group(nn, "water") ~= 0
-end
-
-
-local function get_sign(i)
-	if i == 0 then
-		return 0
-	else
-		return i / math.abs(i)
-	end
 end
 
 
@@ -57,31 +53,24 @@ function boat.on_rightclick(self, clicker)
 	end
 	local name = clicker:get_player_name()
 	if self.driver and name == self.driver then
-		self.driver = nil
-		self.auto = false
+		-- Cleanup happens in boat.on_detach_child
 		clicker:set_detach()
-		player_api.player_attached[name] = false
-		player_api.set_animation(clicker, "stand" , 30)
+
+		player_api.set_animation(clicker, "stand", 30)
 		local pos = clicker:get_pos()
 		pos = {x = pos.x, y = pos.y + 0.2, z = pos.z}
 		minetest.after(0.1, function()
 			clicker:set_pos(pos)
 		end)
 	elseif not self.driver then
-		local attach = clicker:get_attach()
-		if attach and attach:get_luaentity() then
-			local luaentity = attach:get_luaentity()
-			if luaentity.driver then
-				luaentity.driver = nil
-			end
-			clicker:set_detach()
-		end
-		self.driver = name
 		clicker:set_attach(self.object, "",
 			{x = 0.5, y = 1, z = -3}, {x = 0, y = 0, z = 0})
+
+		self.driver = name
 		player_api.player_attached[name] = true
+
 		minetest.after(0.2, function()
-			player_api.set_animation(clicker, "sit" , 30)
+			player_api.set_animation(clicker, "sit", 30)
 		end)
 		clicker:set_look_horizontal(self.object:get_yaw())
 	end
@@ -90,8 +79,12 @@ end
 
 -- If driver leaves server while driving boat
 function boat.on_detach_child(self, child)
-	self.driver = nil
-	self.auto = false
+	if child and child:get_player_name() == self.driver then
+		player_api.player_attached[child:get_player_name()] = false
+
+		self.driver = nil
+		self.auto = false
+	end
 end
 
 
@@ -123,8 +116,7 @@ function boat.on_punch(self, puncher)
 	if not self.driver then
 		self.removed = true
 		local inv = puncher:get_inventory()
-		if not (creative and creative.is_enabled_for
-				and creative.is_enabled_for(name))
+		if not minetest.is_creative_enabled(name)
 				or not inv:contains_item("main", "boats:boat") then
 			local leftover = inv:add_item("main", "boats:boat")
 			-- if no room in inventory add a replacement boat to the world
@@ -141,7 +133,7 @@ end
 
 
 function boat.on_step(self, dtime)
-	self.v = get_v(self.object:get_velocity()) * get_sign(self.v)
+	self.v = get_v(self.object:get_velocity()) * math.sign(self.v)
 	if self.driver then
 		local driver_objref = minetest.get_player_by_name(self.driver)
 		if driver_objref then
@@ -149,16 +141,16 @@ function boat.on_step(self, dtime)
 			if ctrl.up and ctrl.down then
 				if not self.auto then
 					self.auto = true
-					minetest.chat_send_player(self.driver, "[boats] Cruise on")
+					minetest.chat_send_player(self.driver, S("Boat cruise mode on"))
 				end
 			elseif ctrl.down then
-				self.v = self.v - dtime * 1.8
+				self.v = self.v - dtime * 2.0
 				if self.auto then
 					self.auto = false
-					minetest.chat_send_player(self.driver, "[boats] Cruise off")
+					minetest.chat_send_player(self.driver, S("Boat cruise mode off"))
 				end
 			elseif ctrl.up or self.auto then
-				self.v = self.v + dtime * 1.8
+				self.v = self.v + dtime * 2.0
 			end
 			if ctrl.left then
 				if self.v < -0.001 then
@@ -176,19 +168,19 @@ function boat.on_step(self, dtime)
 		end
 	end
 	local velo = self.object:get_velocity()
-	if self.v == 0 and velo.x == 0 and velo.y == 0 and velo.z == 0 then
+	if not self.driver and
+			self.v == 0 and velo.x == 0 and velo.y == 0 and velo.z == 0 then
 		self.object:set_pos(self.object:get_pos())
 		return
 	end
-	local s = get_sign(self.v)
-	self.v = self.v - dtime * 0.6 * s
-	if s ~= get_sign(self.v) then
-		self.object:set_velocity({x = 0, y = 0, z = 0})
+	-- We need to preserve velocity sign to properly apply drag force
+	-- while moving backward
+	local drag = dtime * math.sign(self.v) * (0.01 + 0.0796 * self.v * self.v)
+	-- If drag is larger than velocity, then stop horizontal movement
+	if math.abs(self.v) <= math.abs(drag) then
 		self.v = 0
-		return
-	end
-	if math.abs(self.v) > 5 then
-		self.v = 5 * get_sign(self.v)
+	else
+		self.v = self.v - drag
 	end
 
 	local p = self.object:get_pos()
@@ -242,7 +234,7 @@ minetest.register_entity("boats:boat", boat)
 
 
 minetest.register_craftitem("boats:boat", {
-	description = "Boat",
+	description = S("Boat"),
 	inventory_image = "boats_inventory.png",
 	wield_image = "boats_wield.png",
 	wield_scale = {x = 2, y = 2, z = 1},
@@ -273,8 +265,7 @@ minetest.register_craftitem("boats:boat", {
 				boat:set_yaw(placer:get_look_horizontal())
 			end
 			local player_name = placer and placer:get_player_name() or ""
-			if not (creative and creative.is_enabled_for and
-					creative.is_enabled_for(player_name)) then
+			if not minetest.is_creative_enabled(player_name) then
 				itemstack:take_item()
 			end
 		end

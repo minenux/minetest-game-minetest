@@ -1,4 +1,10 @@
+-- tnt/init.lua
+
 tnt = {}
+
+-- Load support for MT game translation.
+local S = minetest.get_translator("tnt")
+
 
 -- Default to enabled when in singleplayer
 local enable_tnt = minetest.settings:get_bool("enable_tnt")
@@ -16,7 +22,7 @@ local tnt_radius = tonumber(minetest.settings:get("tnt_radius") or 3)
 
 -- Fill a list with data for content IDs, after all nodes are registered
 local cid_data = {}
-minetest.after(0, function()
+minetest.register_on_mods_loaded(function()
 	for name, def in pairs(minetest.registered_nodes) do
 		cid_data[minetest.get_content_id(name)] = {
 			name = name,
@@ -157,42 +163,41 @@ local function entity_physics(pos, radius, drops)
 
 		local damage = (4 / dist) * radius
 		if obj:is_player() then
-			-- currently the engine has no method to set
-			-- player velocity. See #2960
-			-- instead, we knock the player back 1.0 node, and slightly upwards
 			local dir = vector.normalize(vector.subtract(obj_pos, pos))
-			local moveoff = vector.multiply(dir, dist + 1.0)
-			local newpos = vector.add(pos, moveoff)
-			newpos = vector.add(newpos, {x = 0, y = 0.2, z = 0})
-			obj:set_pos(newpos)
+			local moveoff = vector.multiply(dir, 2 / dist * radius)
+			obj:add_velocity(moveoff)
 
 			obj:set_hp(obj:get_hp() - damage)
 		else
-			local do_damage = true
-			local do_knockback = true
-			local entity_drops = {}
 			local luaobj = obj:get_luaentity()
-			local objdef = minetest.registered_entities[luaobj.name]
 
-			if objdef and objdef.on_blast then
-				do_damage, do_knockback, entity_drops = objdef.on_blast(luaobj, damage)
-			end
+			-- object might have disappeared somehow
+			if luaobj then
+				local do_damage = true
+				local do_knockback = true
+				local entity_drops = {}
+				local objdef = minetest.registered_entities[luaobj.name]
 
-			if do_knockback then
-				local obj_vel = obj:get_velocity()
-				obj:set_velocity(calc_velocity(pos, obj_pos,
-						obj_vel, radius * 10))
-			end
-			if do_damage then
-				if not obj:get_armor_groups().immortal then
-					obj:punch(obj, 1.0, {
-						full_punch_interval = 1.0,
-						damage_groups = {fleshy = damage},
-					}, nil)
+				if objdef and objdef.on_blast then
+					do_damage, do_knockback, entity_drops = objdef.on_blast(luaobj, damage)
 				end
-			end
-			for _, item in pairs(entity_drops) do
-				add_drop(drops, item)
+
+				if do_knockback then
+					local obj_vel = obj:get_velocity()
+					obj:set_velocity(calc_velocity(pos, obj_pos,
+							obj_vel, radius * 10))
+				end
+				if do_damage then
+					if not obj:get_armor_groups().immortal then
+						obj:punch(obj, 1.0, {
+							full_punch_interval = 1.0,
+							damage_groups = {fleshy = damage},
+						}, nil)
+					end
+				end
+				for _, item in pairs(entity_drops) do
+					add_drop(drops, item)
+				end
 			end
 		end
 	end
@@ -274,7 +279,7 @@ function tnt.burn(pos, nodename)
 		def.on_ignite(pos)
 	elseif minetest.get_item_group(name, "tnt") > 0 then
 		minetest.swap_node(pos, {name = name .. "_burning"})
-		minetest.sound_play("tnt_ignite", {pos = pos})
+		minetest.sound_play("tnt_ignite", {pos = pos, gain = 1.0}, true)
 		minetest.get_node_timer(pos):start(1)
 	end
 end
@@ -403,12 +408,12 @@ function tnt.boom(pos, def)
 	def.damage_radius = def.damage_radius or def.radius * 2
 	local meta = minetest.get_meta(pos)
 	local owner = meta:get_string("owner")
-	if not def.explode_center then
+	if not def.explode_center and def.ignore_protection ~= true then
 		minetest.set_node(pos, {name = "tnt:boom"})
 	end
 	local sound = def.sound or "tnt_explode"
-	minetest.sound_play(sound, {pos = pos, gain = 1.5,
-			max_hear_distance = math.min(def.radius * 20, 128)})
+	minetest.sound_play(sound, {pos = pos, gain = 2.5,
+			max_hear_distance = math.min(def.radius * 20, 128)}, true)
 	local drops, radius = tnt_explode(pos, def.radius, def.ignore_protection,
 			def.ignore_on_blast, owner, def.explode_center)
 	-- append entity drops
@@ -424,16 +429,18 @@ end
 
 minetest.register_node("tnt:boom", {
 	drawtype = "airlike",
+	inventory_image = "tnt_boom.png",
+	wield_image = "tnt_boom.png",
 	light_source = default.LIGHT_MAX,
 	walkable = false,
 	drop = "",
-	groups = {dig_immediate = 3},
+	groups = {dig_immediate = 3, not_in_creative_inventory = 1},
 	-- unaffected by explosions
 	on_blast = function() end,
 })
 
 minetest.register_node("tnt:gunpowder", {
-	description = "Gun Powder",
+	description = S("Gun Powder"),
 	drawtype = "raillike",
 	paramtype = "light",
 	is_ground_content = false,
@@ -524,7 +531,8 @@ minetest.register_node("tnt:gunpowder_burning", {
 	groups = {
 		dig_immediate = 2,
 		attached_node = 1,
-		connect_to_raillike = minetest.raillike_group("gunpowder")
+		connect_to_raillike = minetest.raillike_group("gunpowder"),
+		not_in_creative_inventory = 1
 	},
 	sounds = default.node_sound_leaves_defaults(),
 	on_timer = function(pos, elapsed)
@@ -546,7 +554,8 @@ minetest.register_node("tnt:gunpowder_burning", {
 	-- unaffected by explosions
 	on_blast = function() end,
 	on_construct = function(pos)
-		minetest.sound_play("tnt_gunpowder_burning", {pos = pos, gain = 2})
+		minetest.sound_play("tnt_gunpowder_burning", {pos = pos,
+			gain = 1.0}, true)
 		minetest.get_node_timer(pos):start(1)
 	end,
 })
@@ -558,7 +567,7 @@ minetest.register_craft({
 })
 
 minetest.register_craftitem("tnt:tnt_stick", {
-	description = "TNT Stick",
+	description = S("TNT Stick"),
 	inventory_image = "tnt_tnt_stick.png",
 	groups = {flammable = 5},
 })
@@ -670,14 +679,14 @@ function tnt.register_tnt(def)
 		light_source = 5,
 		drop = "",
 		sounds = default.node_sound_wood_defaults(),
-		groups = {falling_node = 1},
+		groups = {falling_node = 1, not_in_creative_inventory = 1},
 		on_timer = function(pos, elapsed)
 			tnt.boom(pos, def)
 		end,
 		-- unaffected by explosions
 		on_blast = function() end,
 		on_construct = function(pos)
-			minetest.sound_play("tnt_ignite", {pos = pos})
+			minetest.sound_play("tnt_ignite", {pos = pos}, true)
 			minetest.get_node_timer(pos):start(4)
 			minetest.check_for_falling(pos)
 		end,
@@ -686,6 +695,6 @@ end
 
 tnt.register_tnt({
 	name = "tnt:tnt",
-	description = "TNT",
+	description = S("TNT"),
 	radius = tnt_radius,
 })
