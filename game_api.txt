@@ -500,7 +500,7 @@ TNT API
   * `side`  Side tiles. By default the name of the tnt with a suffix of `_side.png`.
   * `top`  Top tile. By default the name of the tnt with a suffix of `_top.png`.
   * `bottom` Bottom tile. By default the name of the tnt with a suffix of `_bottom.png`.
-  * `burning` Top tile when lit. By default the name of the tnt with a suffix of `_top_burning_animated.png".
+  * `burning` Top tile when lit. By default the name of the tnt with a suffix of `_top_burning_animated.png`.
 
 `tnt.boom(position[, definition])`
 
