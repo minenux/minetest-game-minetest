@@ -78,7 +78,7 @@ pooly provided and better managed by mods like rspawn and spawnrandom.
 This source code and files are only compatible with matched minetest4 engine
 from https://codeberg.org/minenux/minetest-engine/src/branch/stable-4.0 
 Additionally, when the Minetest4 engine is tagged to be a certain version (e.g.
-4.0.18), Minetest Game is tagged with the version 4.0.18 too.
+4.0.17), Minetest Game is tagged with the version 4.0.17 too.
 
 ## Licensing
 
