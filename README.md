@@ -10,8 +10,8 @@ for minetest v5 and minetest v4 or 0.4.
 Introduction
 ------------
 
-This is the branch `stable-4.0` of minetest game for minetest4 a version 
-that is focused in v5 of minetest but mainly in 4.0 release. There's 
+This is the branch `stable-4.1` of minetest game for minetest4 a version 
+that is focused in v4 of minetest but mainly in 0.4.18/4.0.18 release. There's 
 also a minetest4 game version too in `stable-4.0` branch.
 
 This are focused to provide minimal default game featured for minetest4 
@@ -22,18 +22,18 @@ For further information, check the [Minetest Wiki](https://wiki.minetest.net/Sub
 ## Download
 
 Can be obtained from https://codeberg.org/minenux/minetest-game-minetest/tags 
-those like 4.0.X by example https://codeberg.org/minenux/minetest-game-minetest/releases/tag/4.0.17
+those like 4.0.X by example https://codeberg.org/minenux/minetest-game-minetest/releases/tag/4.0.18
 
 It will download a tar.gz file, uncompress the content and a directory will be created, 
 the name of the directory does not matter, the contents will be used later to install.
 
 When stable releases are made, Minetest Game and the Minetest engine is packaged 
 and made available at https://codeberg.org/minenux/minetest-engine/archive/stable-4.0.tar.gz 
-or generally at https://codeberg.org/minenux/minetest-engine/releases/tag/4.0.17 by example.
+or generally at https://codeberg.org/minenux/minetest-engine/releases/tag/4.0.18 by example.
 
 ## Installation
 
-This game can be used in any version from 5.0 to 4.0, it may work with 5.3 but not with 5.5
+This game can be used in any version from 0.4.18 to 4.0.18 and 5.2, it does nto work with 5.3 or up
 
 After download, rename the directory decompressed to `minetest_game` and put to the "games" directory:
 
@@ -50,11 +50,15 @@ For further information or help, see: https://wiki.minetest.net/Installing_Mods
 * bucket
 * bones
 * boats
+* butterflies
 * creative
 * default
+* player_api
+* sethome
 * doors
 * farming
 * fire
+* fireflies
 * give_initial_stuff
 * stairs
 * carts
@@ -68,17 +72,16 @@ For further information or help, see: https://wiki.minetest.net/Installing_Mods
 * walls
 * wool
 
-The default mod provides sethome and player_api call ones, binoculars from v5 are 
-just separate privilegies for zoom, butterflies and fireflies from v5 can be set 
-by dmobs or mobs_doomed mod, the spawn mod is just minimal spawn management 
+The binoculars from v5 were removed due lackof features in engine api, and it 
+just separate privilegies for zoom, the spawn mod is just minimal spawn management 
 pooly provided and better managed by mods like rspawn and spawnrandom.
 
 ## Compatibility
 
 This source code and files are only compatible with matched minetest4 engine
-from https://codeberg.org/minenux/minetest-engine/src/branch/stable-4.0 
+from https://codeberg.org/minenux/minetest-engine/src/branch/stable-4.1 
 Additionally, when the Minetest4 engine is tagged to be a certain version (e.g.
-4.0.17), Minetest Game is tagged with the version 4.0.17 too.
+4.0.18), Minetest Game is tagged with the version 4.0.18 too.
 
 ## Licensing
 

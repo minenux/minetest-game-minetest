@@ -10,11 +10,13 @@ For information check [../README.md](../README.md)
 * bucket
 * bones
 * boats
+* butterflies
 * creative
 * default
 * doors
 * farming
 * fire
+* fireflies
 * give_initial_stuff
 * stairs
 * carts
@@ -29,8 +31,7 @@ For information check [../README.md](../README.md)
 * wool
 
 The default mod provides sethome and player_api call ones, binoculars from v5 are 
-just separate privilegies for zoom, butterflies and fireflies from v5 can be set 
-by dmobs or mobs_doomed mod, the spawn mod is just minimal spawn management 
+just separate privilegies for zoom, the spawn mod is just minimal spawn management 
 pooly provided and better managed by mods like rspawn and spawnrandom.
 
 ## Compatibility
