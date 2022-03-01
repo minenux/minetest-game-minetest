@@ -1,13 +1,17 @@
 Minetest Game API
 =================
-GitHub Repo: https://github.com/minetest/minetest_game
+
+This is a fork of the original one at https://github.com/minetest/minetest_game
+For more information about fork check [Differences](#differences) section.
 
 Introduction
 ------------
 
-The Minetest Game subgame offers multiple new possibilities in addition to the Minetest engine's built-in API,
-allowing you to add new plants to farming mod, buckets for new liquids, new stairs and custom panes.
-For information on the Minetest API, visit https://github.com/minetest/minetest/blob/master/doc/lua_api.txt
+The Minetest5 Game game offers multiple new possibilities in addition to 
+the Minetest engine's built-in API, allowing you to add new plants to farming mod, 
+buckets for new liquids, new stairs and custom panes.
+
+For information on the Minetest5 API, visit https://codeberg.org/minenux/minetest-engine-minetest/src/branch/stable-5.2/doc/lua_api.txt
 Please note:
 
  * [XYZ] refers to a section the Minetest API
@@ -302,7 +306,7 @@ TNT API
   * `side`  Side tiles. By default the name of the tnt with a suffix of `_side.png`.
   * `top`  Top tile. By default the name of the tnt with a suffix of `_top.png`.
   * `bottom` Bottom tile. By default the name of the tnt with a suffix of `_bottom.png`.
-  * `burning` Top tile when lit. By default the name of the tnt with a suffix of `_top_burning_animated.png".
+  * `burning` Top tile when lit. By default the name of the tnt with a suffix of `_top_burning_animated.png`.
 
 `tnt.boom(position[, definition])`
 
