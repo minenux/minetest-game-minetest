@@ -1,77 +1,468 @@
--- Minetest 0.4 mod: stairs
--- See README.txt for licensing and other information.
+
+-- wool sounds
+function default.node_sound_wool_defaults(table)
+
+	table = table or {}
+
+	table.footstep = table.footstep or 	{name = "wool_coat_movement", gain = 1.0}
+	table.dug = table.dug or {name = "wool_coat_movement", gain = 0.25}
+	table.place = table.place or {name = "default_place_node", gain = 1.0}
+
+	return table
+end
+
+-- add new 5.x snow sounds to 0.4.x client
+if not minetest.has_feature("object_use_texture_alpha") then
+
+	function default.node_sound_snow_defaults(table)
+
+		table = table or {}
+
+		table.footstep = table.footstep or {name = "default_snow_footstep", gain = 0.1}
+		table.dug = table.dug or {name = "default_snow_footstep", gain = 0.3}
+		table.place = table.place or {name = "default_place_node", gain = 1.0}
+
+		return table
+	end
+end
+
+stairs = {
+	mod = "redo",
+	wood = default.node_sound_wood_defaults(),
+	dirt = default.node_sound_dirt_defaults(),
+	stone = default.node_sound_stone_defaults(),
+	glass = default.node_sound_glass_defaults(),
+	leaves = default.node_sound_leaves_defaults(),
+	metal = default.node_sound_metal_defaults(),
+	wool = default.node_sound_wool_defaults()
+}
 
 
--- Global namespace for functions
+-- cache creative
+local creative = minetest.settings:get_bool("creative_mode")
 
-stairs = {}
+function is_creative_enabled_for(name)
+
+	if creative or minetest.check_player_privs(name, {creative = true}) then
+		return true
+	end
+
+	return false
+end
 
 
--- Register aliases for new pine node names
+-- process textures
+local set_textures = function(images, worldaligntex)
 
-minetest.register_alias("stairs:stair_pinewood", "stairs:stair_pine_wood")
-minetest.register_alias("stairs:slab_pinewood", "stairs:slab_pine_wood")
+	local stair_images = {}
 
+	for i, image in ipairs(images) do
 
--- Get setting for replace ABM
+		if type(image) == "string" then
 
-local replace = minetest.settings:get_bool("enable_stairs_replace_abm")
+			stair_images[i] = {
+				name = image,
+				backface_culling = true
+			}
 
-local function rotate_and_place(itemstack, placer, pointed_thing)
-	local p0 = pointed_thing.under
-	local p1 = pointed_thing.above
-	local param2 = 0
+			if worldaligntex then
+				stair_images[i].align_style = "world"
+			end
+		else
+			stair_images[i] = table.copy(image)
 
-	if placer then
-		local placer_pos = placer:getpos()
-		if placer_pos then
-			param2 = minetest.dir_to_facedir(vector.subtract(p1, placer_pos))
-		end
+			if stair_images[i].backface_culling == nil then
+				stair_images[i].backface_culling = true
+			end
 
-		local finepos = minetest.pointed_thing_to_face_pos(placer, pointed_thing)
-		local fpos = finepos.y % 1
-
-		if p0.y - 1 == p1.y or (fpos > 0 and fpos < 0.5)
-				or (fpos < -0.5 and fpos > -0.999999999) then
-			param2 = param2 + 20
-			if param2 == 21 then
-				param2 = 23
-			elseif param2 == 23 then
-				param2 = 21
+			if worldaligntex and stair_images[i].align_style == nil then
+				stair_images[i].align_style = "world"
 			end
 		end
 	end
-	return minetest.item_place(itemstack, placer, pointed_thing, param2)
+
+	return stair_images
 end
 
--- Register stairs.
--- Node will be called stairs:stair_<subname>
 
-function stairs.register_stair(subname, recipeitem, groups, images, description, sounds)
-	local stair_images = {}
-	for i, image in ipairs(images) do
-		if type(image) == "string" then
-			stair_images[i] = {
-				name = image,
-				backface_culling = true,
-			}
-		elseif image.backface_culling == nil then -- override using any other value
-			stair_images[i] = table.copy(image)
-			stair_images[i].backface_culling = true
+-- placement helper
+local stair_place = function(itemstack, placer, pointed_thing, stair_node)
+
+	-- if sneak pressed then use param2 in node pointed at when placing
+	if placer:is_player() and placer:get_player_control().sneak then
+
+		local name  = placer:get_player_name()
+		local pos_a = pointed_thing.above
+		local node_a = minetest.get_node(pos_a)
+		local def_a = minetest.registered_nodes[node_a.name]
+
+		if not def_a.buildable_to
+		or minetest.is_protected(pos_a, name) then
+			return itemstack
+		end
+
+		local pos_u = pointed_thing.under
+		local node_u = minetest.get_node(pos_u)
+
+		if minetest.get_item_group(node_u.name, "stair") > 0
+		or minetest.get_item_group(node_u.name, "slab") > 0 then
+
+			minetest.set_node(pos_a, {
+				name = stair_node,
+				param2 = node_u.param2
+			})
+
+			if not is_creative_enabled_for(name) then
+				itemstack:take_item()
+			end
+
+			return itemstack
 		end
 	end
+
+	core.rotate_and_place(itemstack, placer, pointed_thing,
+			is_creative_enabled_for(placer:get_player_name()),
+			{invert_wall = placer:get_player_control().sneak})
+
+	return itemstack
+end
+
+
+-- get node settings to use for stairs
+local function get_node_vars(nodename)
+
+	local def = minetest.registered_nodes[nodename]
+
+	if def then
+		return def.light_source, def.use_texture_alpha, def.sunlight_propagates
+	end
+
+	return nil, nil, nil
+end
+
+
+-- if recipeitem can be burned then stair can be as well
+local function set_burn(recipeitem, stair_name, v)
+
+	local burntime = minetest.get_craft_result({
+		method = "fuel", width = 1, items = {recipeitem} }).time
+
+	if burntime > 0 then
+
+		minetest.register_craft({
+			type = "fuel",
+			recipe = stair_name,
+			burntime = math.floor(burntime * v)
+		})
+	end
+end
+
+
+-- Node will be called stairs:stair_<subname>
+function stairs.register_stair(
+		subname, recipeitem, groups, images, description, snds, wat)
+
+	local stair_images = set_textures(images, wat)
 	local new_groups = table.copy(groups)
+
 	new_groups.stair = 1
+
+	local light, alpha, propa = get_node_vars(recipeitem)
+
 	minetest.register_node(":stairs:stair_" .. subname, {
 		description = description,
-		drawtype = "mesh",
-		mesh = "stairs_stair.obj",
+		drawtype = "nodebox",
 		tiles = stair_images,
 		paramtype = "light",
 		paramtype2 = "facedir",
 		is_ground_content = false,
+		use_texture_alpha = alpha,
+		light_source = light,
+		sunlight_propagates = propa,
 		groups = new_groups,
-		sounds = sounds,
+		sounds = snds,
+		node_box = {
+			type = "fixed",
+			fixed = {
+				{-0.5, -0.5, -0.5, 0.5, 0, 0.5},
+				{-0.5, 0, 0, 0.5, 0.5, 0.5}
+			}
+		},
+
+		on_place = function(itemstack, placer, pointed_thing)
+
+			return stair_place(itemstack, placer, pointed_thing,
+					"stairs:stair_" .. subname)
+		end
+	})
+
+	-- if no recipe item provided then skip craft recipes
+	if not recipeitem then
+		return
+	end
+
+	-- stair recipes
+	minetest.register_craft({
+		output = "stairs:stair_" .. subname .. " 8",
+		recipe = {
+			{recipeitem, "", ""},
+			{recipeitem, recipeitem, ""},
+			{recipeitem, recipeitem, recipeitem}
+		}
+	})
+
+	minetest.register_craft({
+		output = "stairs:stair_" .. subname .. " 8",
+		recipe = {
+			{"", "", recipeitem},
+			{"", recipeitem, recipeitem},
+			{recipeitem, recipeitem, recipeitem}
+		}
+	})
+
+	-- stair to original material recipe
+	minetest.register_craft({
+		output = recipeitem .. " 3",
+		recipe = {
+			{"stairs:stair_" .. subname, "stairs:stair_" .. subname},
+			{"stairs:stair_" .. subname, "stairs:stair_" .. subname}
+		}
+	})
+
+	set_burn(recipeitem, "stairs:stair_" .. subname, 0.75)
+end
+
+
+-- Node will be called stairs:slab_<subname>
+function stairs.register_slab(
+		subname, recipeitem, groups, images, description, snds, wat)
+
+	local slab_images = set_textures(images, wat)
+	local new_groups = table.copy(groups)
+
+	new_groups.slab = 1
+
+	local light, alpha, propa = get_node_vars(recipeitem)
+
+	minetest.register_node(":stairs:slab_" .. subname, {
+		description = description,
+		drawtype = "nodebox",
+		tiles = slab_images,
+		paramtype = "light",
+		paramtype2 = "facedir",
+		is_ground_content = false,
+		use_texture_alpha = alpha,
+		light_source = light,
+		sunlight_propagates = propa,
+		groups = new_groups,
+		sounds = snds,
+		node_box = {
+			type = "fixed",
+			fixed = {-0.5, -0.5, -0.5, 0.5, 0, 0.5}
+		},
+
+		on_place = function(itemstack, placer, pointed_thing)
+
+			return stair_place(itemstack, placer, pointed_thing,
+					"stairs:slab_" .. subname)
+		end
+	})
+
+	-- if no recipe item provided then skip craft recipes
+	if not recipeitem then
+		return
+	end
+
+	-- slab recipe
+	minetest.register_craft({
+		output = "stairs:slab_" .. subname .. " 6",
+		recipe = {
+			{recipeitem, recipeitem, recipeitem}
+		}
+	})
+
+	-- slab to original material recipe
+	minetest.register_craft({
+		output = recipeitem,
+		recipe = {
+			{"stairs:slab_" .. subname},
+			{"stairs:slab_" .. subname}
+		}
+	})
+
+	set_burn(recipeitem, "stairs:slab_" .. subname, 0.5)
+end
+
+
+-- Node will be called stairs:stair_outer_<subname>
+function stairs.register_stair_outer(
+		subname, recipeitem, groups, images, description, snds, wat, fdesc)
+
+	local stair_images = set_textures(images, wat)
+	local new_groups = table.copy(groups)
+
+	new_groups.stair = 1
+
+	local light, alpha, propa = get_node_vars(recipeitem)
+
+	minetest.register_node(":stairs:stair_outer_" .. subname, {
+		description = fdesc or "Outer " .. description,
+		drawtype = "nodebox",
+		tiles = stair_images,
+		paramtype = "light",
+		paramtype2 = "facedir",
+		is_ground_content = false,
+		use_texture_alpha = alpha,
+		light_source = light,
+		sunlight_propagates = propa,
+		groups = new_groups,
+		sounds = snds,
+		node_box = {
+			type = "fixed",
+			fixed = {
+				{-0.5, -0.5, -0.5, 0.5, 0, 0.5},
+				{-0.5, 0, 0, 0, 0.5, 0.5}
+			},
+		},
+
+		on_place = function(itemstack, placer, pointed_thing)
+
+			return stair_place(itemstack, placer, pointed_thing,
+					"stairs:stair_outer_" .. subname)
+		end
+	})
+
+	-- add alias for old stairs redo name
+	minetest.register_alias("stairs:corner_" .. subname,
+			"stairs:stair_outer_" .. subname)
+
+	-- if no recipe item provided then skip craft recipes
+	if not recipeitem then
+		return
+	end
+
+	-- corner stair recipe
+	minetest.register_craft({
+		output = "stairs:stair_outer_" .. subname .. " 6",
+		recipe = {
+			{"", "", ""},
+			{"", recipeitem, ""},
+			{recipeitem, recipeitem, recipeitem}
+		},
+	})
+
+	-- corner stair to original material recipe
+	minetest.register_craft({
+		output = recipeitem .. " 2",
+		recipe = {
+			{"stairs:stair_outer_" .. subname,
+					"stairs:stair_outer_" .. subname},
+			{"stairs:stair_outer_" .. subname,
+					"stairs:stair_outer_" .. subname}
+		}
+	})
+
+	set_burn(recipeitem, "stairs:stair_outer_" .. subname, 0.625)
+end
+
+
+-- Node will be called stairs:stair_inner_<subname>
+function stairs.register_stair_inner(
+		subname, recipeitem, groups, images, description, snds, wat, fdesc)
+
+	local stair_images = set_textures(images, wat)
+	local new_groups = table.copy(groups)
+
+	new_groups.stair = 1
+
+	local light, alpha, propa = get_node_vars(recipeitem)
+
+	minetest.register_node(":stairs:stair_inner_" .. subname, {
+		description = fdesc or "Inner " .. description,
+		drawtype = "nodebox",
+		tiles = stair_images,
+		paramtype = "light",
+		paramtype2 = "facedir",
+		is_ground_content = false,
+		use_texture_alpha = alpha,
+		light_source = light,
+		sunlight_propagates = propa,
+		groups = new_groups,
+		sounds = snds,
+		node_box = {
+			type = "fixed",
+			fixed = {
+				{-0.5, -0.5, -0.5, 0.5, 0, 0.5},
+				{-0.5, 0, 0, 0.5, 0.5, 0.5},
+				{-0.5, 0, -0.5, 0, 0.5, 0}
+			}
+		},
+
+		on_place = function(itemstack, placer, pointed_thing)
+
+			return stair_place(itemstack, placer, pointed_thing,
+					"stairs:stair_inner_" .. subname)
+		end,
+	})
+
+	-- add alias for old stairs redo name
+	minetest.register_alias("stairs:invcorner_" .. subname,
+			"stairs:stair_inner_" .. subname)
+
+	-- if no recipe item provided then skip craft recipes
+	if not recipeitem then
+		return
+	end
+
+	-- inside corner stair recipe
+	minetest.register_craft({
+		output = "stairs:stair_inner_" .. subname .. " 9",
+		recipe = {
+			{recipeitem, recipeitem, ""},
+			{recipeitem, recipeitem, recipeitem},
+			{recipeitem, recipeitem, recipeitem},
+		}
+	})
+
+	-- inside corner stair to original material recipe
+	minetest.register_craft({
+		output = recipeitem .. " 3",
+		recipe = {
+			{"stairs:stair_inner_" .. subname,
+					"stairs:stair_inner_" .. subname},
+			{"stairs:stair_inner_" .. subname,
+					"stairs:stair_inner_" .. subname}
+		}
+	})
+
+	set_burn(recipeitem, "stairs:stair_inner_" .. subname, 0.875)
+end
+
+
+-- Node will be called stairs:slope_<subname>
+function stairs.register_slope(
+		subname, recipeitem, groups, images, description, snds, wat)
+
+	local stair_images = set_textures(images, wat)
+	local new_groups = table.copy(groups)
+
+	new_groups.stair = 1
+
+	local light, alpha, propa = get_node_vars(recipeitem)
+
+	minetest.register_node(":stairs:slope_" .. subname, {
+		description = description,
+		drawtype = "mesh",
+		mesh = "stairs_slope.obj",
+		tiles = stair_images,
+		paramtype = "light",
+		paramtype2 = "facedir",
+		is_ground_content = false,
+		use_texture_alpha = alpha,
+		light_source = light,
+		sunlight_propagates = propa,
+		groups = new_groups,
+		sounds = snds,
 		selection_box = {
 			type = "fixed",
 			fixed = {
@@ -83,528 +474,236 @@ function stairs.register_stair(subname, recipeitem, groups, images, description,
 			type = "fixed",
 			fixed = {
 				{-0.5, -0.5, -0.5, 0.5, 0, 0.5},
-				{-0.5, 0, 0, 0.5, 0.5, 0.5},
+				{-0.5, 0, 0, 0.5, 0.5, 0.5}
 			},
 		},
-		on_place = function(itemstack, placer, pointed_thing)
-			if pointed_thing.type ~= "node" then
-				return itemstack
-			end
 
-			return rotate_and_place(itemstack, placer, pointed_thing)
-		end,
+		on_place = function(itemstack, placer, pointed_thing)
+			return stair_place(itemstack, placer, pointed_thing,
+					"stairs:slope_" .. subname)
+		end
 	})
 
-	-- for replace ABM
-	if replace then
-		minetest.register_node(":stairs:stair_" .. subname .. "upside_down", {
-			replace_name = "stairs:stair_" .. subname,
-			groups = {slabs_replace = 1},
-		})
-	end
+	-- slope recipe
+	minetest.register_craft({
+		output = "stairs:slope_" .. subname .. " 6",
+		recipe = {
+			{recipeitem, "", ""},
+			{recipeitem, recipeitem, ""}
+		}
+	})
 
-	if recipeitem then
-		-- Recipe matches appearence in inventory
-		minetest.register_craft({
-			output = 'stairs:stair_' .. subname .. ' 8',
-			recipe = {
-				{"", "", recipeitem},
-				{"", recipeitem, recipeitem},
-				{recipeitem, recipeitem, recipeitem},
-			},
-		})
+	-- slope to original material recipe
+	minetest.register_craft({
+		output = recipeitem,
+		recipe = {
+			{"stairs:slope_" .. subname, "stairs:slope_" .. subname}
+		}
+	})
 
-		-- Fuel
-		local baseburntime = minetest.get_craft_result({
-			method = "fuel",
-			width = 1,
-			items = {recipeitem}
-		}).time
-		if baseburntime > 0 then
-			minetest.register_craft({
-				type = "fuel",
-				recipe = 'stairs:stair_' .. subname,
-				burntime = math.floor(baseburntime * 0.75),
-			})
-		end
-	end
+	set_burn(recipeitem, "stairs:slope_" .. subname, 0.5)
 end
 
 
--- Slab facedir to placement 6d matching table
-local slab_trans_dir = {[0] = 8, 0, 2, 1, 3, 4}
+-- Node will be called stairs:slope_inner_<subname>
+function stairs.register_slope_inner(
+		subname, recipeitem, groups, images, description, snds, wat)
 
--- Register slabs.
--- Node will be called stairs:slab_<subname>
-
-function stairs.register_slab(subname, recipeitem, groups, images, description, sounds)
+	local stair_images = set_textures(images, wat)
 	local new_groups = table.copy(groups)
-	new_groups.slab = 1
-	minetest.register_node(":stairs:slab_" .. subname, {
+
+	new_groups.stair = 1
+
+	local light, alpha, propa = get_node_vars(recipeitem)
+
+	minetest.register_node(":stairs:slope_inner_" .. subname, {
 		description = description,
-		drawtype = "nodebox",
-		tiles = images,
+		drawtype = "mesh",
+		mesh = "stairs_slope_inner.obj",
+		tiles = stair_images,
 		paramtype = "light",
 		paramtype2 = "facedir",
 		is_ground_content = false,
+		use_texture_alpha = alpha,
+		light_source = light,
+		sunlight_propagates = propa,
 		groups = new_groups,
-		sounds = sounds,
-		node_box = {
+		sounds = snds,
+		selection_box = {
 			type = "fixed",
-			fixed = {-0.5, -0.5, -0.5, 0.5, 0, 0.5},
+			fixed = {
+				{-0.5, -0.5, -0.5, 0.5, 0, 0.5},
+				{-0.5, 0, 0, 0.5, 0.5, 0.5},
+				{-0.5, 0, -0.5, 0, 0.5, 0}
+			}
 		},
+		collision_box = {
+			type = "fixed",
+			fixed = {
+				{-0.5, -0.5, -0.5, 0.5, 0, 0.5},
+				{-0.5, 0, 0, 0.5, 0.5, 0.5},
+				{-0.5, 0, -0.5, 0, 0.5, 0}
+			}
+		},
+
 		on_place = function(itemstack, placer, pointed_thing)
-			local under = minetest.get_node(pointed_thing.under)
-			local wield_item = itemstack:get_name()
-			local player_name = placer and placer:get_player_name() or ""
-			local creative_enabled = (creative and creative.is_enabled_for
-					and creative.is_enabled_for(player_name))
-
-			if under and under.name:find("stairs:slab_") then
-				-- place slab using under node orientation
-				local dir = minetest.dir_to_facedir(vector.subtract(
-					pointed_thing.above, pointed_thing.under), true)
-
-				local p2 = under.param2
-
-				-- combine two slabs if possible
-				if slab_trans_dir[math.floor(p2 / 4)] == dir
-						and wield_item == under.name then
-
-					if not recipeitem then
-						return itemstack
-					end
-					if minetest.is_protected(pointed_thing.under, player_name) and not
-							minetest.check_player_privs(player_name, "protection_bypass") then
-						minetest.record_protection_violation(pointed_thing.under,
-							player_name)
-						return
-					end
-					minetest.set_node(pointed_thing.under, {name = recipeitem, param2 = p2})
-					if not creative_enabled then
-						itemstack:take_item()
-					end
-					return itemstack
-				end
-
-				-- Placing a slab on an upside down slab should make it right-side up.
-				if p2 >= 20 and dir == 8 then
-					p2 = p2 - 20
-				-- same for the opposite case: slab below normal slab
-				elseif p2 <= 3 and dir == 4 then
-					p2 = p2 + 20
-				end
-
-				-- else attempt to place node with proper param2
-				minetest.item_place_node(ItemStack(wield_item), placer, pointed_thing, p2)
-				if not creative_enabled then
-					itemstack:take_item()
-				end
-				return itemstack
-			else
-				return rotate_and_place(itemstack, placer, pointed_thing)
-			end
-		end,
-	})
-
-	-- for replace ABM
-	if replace then
-		minetest.register_node(":stairs:slab_" .. subname .. "upside_down", {
-			replace_name = "stairs:slab_".. subname,
-			groups = {slabs_replace = 1},
-		})
-	end
-
-	if recipeitem then
-		minetest.register_craft({
-			output = 'stairs:slab_' .. subname .. ' 6',
-			recipe = {
-				{recipeitem, recipeitem, recipeitem},
-			},
-		})
-
-		-- Fuel
-		local baseburntime = minetest.get_craft_result({
-			method = "fuel",
-			width = 1,
-			items = {recipeitem}
-		}).time
-		if baseburntime > 0 then
-			minetest.register_craft({
-				type = "fuel",
-				recipe = 'stairs:slab_' .. subname,
-				burntime = math.floor(baseburntime * 0.5),
-			})
+			return stair_place(itemstack, placer, pointed_thing,
+					"stairs:slope_inner_" .. subname)
 		end
-	end
-end
-
-
--- Optionally replace old "upside_down" nodes with new param2 versions.
--- Disabled by default.
-
-if replace then
-	minetest.register_abm({
-		label = "Slab replace",
-		nodenames = {"group:slabs_replace"},
-		interval = 16,
-		chance = 1,
-		action = function(pos, node)
-			node.name = minetest.registered_nodes[node.name].replace_name
-			node.param2 = node.param2 + 20
-			if node.param2 == 21 then
-				node.param2 = 23
-			elseif node.param2 == 23 then
-				node.param2 = 21
-			end
-			minetest.set_node(pos, node)
-		end,
 	})
+
+	-- slope recipe
+	minetest.register_craft({
+		output = "stairs:slope_inner_" .. subname .. " 6",
+		recipe = {
+			{"", recipeitem, recipeitem},
+			{recipeitem, recipeitem, recipeitem}
+		}
+	})
+
+	-- slope to original material recipe
+	minetest.register_craft({
+		output = recipeitem,
+		recipe = {
+			{"stairs:slope_inner_" .. subname, "stairs:slope_inner_" .. subname}
+		}
+	})
+
+	set_burn(recipeitem, "stairs:slope_inner_" .. subname, 0.5)
 end
 
 
--- Stair/slab registration function.
+-- Node will be called stairs:slope_outer_<subname>
+function stairs.register_slope_outer(
+		subname, recipeitem, groups, images, description, snds, wat)
+
+	local stair_images = set_textures(images, wat)
+	local new_groups = table.copy(groups)
+
+	new_groups.stair = 1
+
+	local light, alpha, propa = get_node_vars(recipeitem)
+
+	minetest.register_node(":stairs:slope_outer_" .. subname, {
+		description = description,
+		drawtype = "mesh",
+		mesh = "stairs_slope_outer.obj",
+		tiles = stair_images,
+		paramtype = "light",
+		paramtype2 = "facedir",
+		is_ground_content = false,
+		use_texture_alpha = alpha,
+		light_source = light,
+		sunlight_propagates = propa,
+		groups = new_groups,
+		sounds = snds,
+		selection_box = {
+			type = "fixed",
+			fixed = {
+				{-0.5, -0.5, -0.5, 0.5, 0, 0.5},
+				{-0.5, 0, 0, 0, 0.5, 0.5}
+			},
+		},
+		collision_box = {
+			type = "fixed",
+			fixed = {
+				{-0.5, -0.5, -0.5, 0.5, 0, 0.5},
+				{-0.5, 0, 0, 0, 0.5, 0.5}
+			},
+		},
+
+		on_place = function(itemstack, placer, pointed_thing)
+			return stair_place(itemstack, placer, pointed_thing,
+					"stairs:slope_outer_" .. subname)
+		end
+	})
+
+	-- slope recipe
+	minetest.register_craft({
+		output = "stairs:slope_outer_" .. subname .. " 6",
+		recipe = {
+			{"", "", recipeitem},
+			{"", recipeitem, recipeitem}
+		}
+	})
+
+	-- slope to original material recipe
+	minetest.register_craft({
+		output = recipeitem,
+		recipe = {
+			{"stairs:slope_outer_" .. subname, "stairs:slope_outer_" .. subname}
+		}
+	})
+
+	set_burn(recipeitem, "stairs:slope_outer_" .. subname, 0.5)
+end
+
+
 -- Nodes will be called stairs:{stair,slab}_<subname>
+function stairs.register_stair_and_slab(
+		subname, recipeitem, groups, images, desc_stair, desc_slab, sounds, wat)
 
-function stairs.register_stair_and_slab(subname, recipeitem,
-		groups, images, desc_stair, desc_slab, sounds)
-	stairs.register_stair(subname, recipeitem, groups, images, desc_stair, sounds)
-	stairs.register_slab(subname, recipeitem, groups, images, desc_slab, sounds)
+	stairs.register_stair(
+			subname, recipeitem, groups, images, desc_stair, sounds, wat)
+
+	stairs.register_stair_inner(
+			subname, recipeitem, groups, images, desc_stair, sounds, wat)
+
+	stairs.register_stair_outer(
+			subname, recipeitem, groups, images, desc_stair, sounds, wat)
+
+	stairs.register_slab(
+			subname, recipeitem, groups, images, desc_slab, sounds, wat)
 end
 
 
--- Register default stairs and slabs
+-- Nodes will be called stairs:{stair,slab,corner,invcorner,slope}_<subname>
+function stairs.register_all(
+		subname, recipeitem, groups, images, desc, snds, wat)
 
-stairs.register_stair_and_slab(
-	"wood",
-	"default:wood",
-	{choppy = 2, oddly_breakable_by_hand = 2, flammable = 2},
-	{"default_wood.png"},
-	"Wooden Stair",
-	"Wooden Slab",
-	default.node_sound_wood_defaults()
-)
+	stairs.register_stair(
+			subname, recipeitem, groups, images, desc .. " Stair", snds, wat)
 
-stairs.register_stair_and_slab(
-	"junglewood",
-	"default:junglewood",
-	{choppy = 2, oddly_breakable_by_hand = 2, flammable = 2},
-	{"default_junglewood.png"},
-	"Jungle Wood Stair",
-	"Jungle Wood Slab",
-	default.node_sound_wood_defaults()
-)
+	stairs.register_slab(
+			subname, recipeitem, groups, images, desc .. " Slab", snds, wat)
 
-stairs.register_stair_and_slab(
-	"pine_wood",
-	"default:pine_wood",
-	{choppy = 3, oddly_breakable_by_hand = 2, flammable = 3},
-	{"default_pine_wood.png"},
-	"Pine Wood Stair",
-	"Pine Wood Slab",
-	default.node_sound_wood_defaults()
-)
+	stairs.register_stair_inner(
+			subname, recipeitem, groups, images, desc .. " Stair", snds, wat)
 
-stairs.register_stair_and_slab(
-	"acacia_wood",
-	"default:acacia_wood",
-	{choppy = 2, oddly_breakable_by_hand = 2, flammable = 2},
-	{"default_acacia_wood.png"},
-	"Acacia Wood Stair",
-	"Acacia Wood Slab",
-	default.node_sound_wood_defaults()
-)
+	stairs.register_stair_outer(
+			subname, recipeitem, groups, images, desc .. " Stair", snds, wat)
 
-stairs.register_stair_and_slab(
-	"aspen_wood",
-	"default:aspen_wood",
-	{choppy = 3, oddly_breakable_by_hand = 2, flammable = 3},
-	{"default_aspen_wood.png"},
-	"Aspen Wood Stair",
-	"Aspen Wood Slab",
-	default.node_sound_wood_defaults()
-)
+	stairs.register_slope(
+			subname, recipeitem, groups, images, desc .. " Slope", snds, wat)
 
-stairs.register_stair_and_slab(
-	"stone",
-	"default:stone",
-	{cracky = 3},
-	{"default_stone.png"},
-	"Stone Stair",
-	"Stone Slab",
-	default.node_sound_stone_defaults()
-)
+	stairs.register_slope_inner(
+			subname, recipeitem, groups, images, desc .. " Slope", snds, wat)
 
-stairs.register_stair_and_slab(
-	"cobble",
-	"default:cobble",
-	{cracky = 3},
-	{"default_cobble.png"},
-	"Cobblestone Stair",
-	"Cobblestone Slab",
-	default.node_sound_stone_defaults()
-)
+	stairs.register_slope_outer(
+			subname, recipeitem, groups, images, desc .. " Slope", snds, wat)
+end
 
-stairs.register_stair_and_slab(
-	"mossycobble",
-	"default:mossycobble",
-	{cracky = 3},
-	{"default_mossycobble.png"},
-	"Mossy Cobblestone Stair",
-	"Mossy Cobblestone Slab",
-	default.node_sound_stone_defaults()
-)
 
-stairs.register_stair_and_slab(
-	"stonebrick",
-	"default:stonebrick",
-	{cracky = 2},
-	{"default_stone_brick.png"},
-	"Stone Brick Stair",
-	"Stone Brick Slab",
-	default.node_sound_stone_defaults()
-)
+-- compatibility function for previous stairs:invcorner_<subname>
+function stairs.register_invcorner(
+		subname, recipeitem, groups, images, desc, snds, wat)
 
-stairs.register_stair_and_slab(
-	"stone_block",
-	"default:stone_block",
-	{cracky = 2},
-	{"default_stone_block.png"},
-	"Stone Block Stair",
-	"Stone Block Slab",
-	default.node_sound_stone_defaults()
-)
+	stairs.register_stair_inner(
+			subname, recipeitem, groups, images, desc .. " Stair", snds, wat)
+end
 
-stairs.register_stair_and_slab(
-	"desert_stone",
-	"default:desert_stone",
-	{cracky = 3},
-	{"default_desert_stone.png"},
-	"Desert Stone Stair",
-	"Desert Stone Slab",
-	default.node_sound_stone_defaults()
-)
 
-stairs.register_stair_and_slab(
-	"desert_cobble",
-	"default:desert_cobble",
-	{cracky = 3},
-	{"default_desert_cobble.png"},
-	"Desert Cobblestone Stair",
-	"Desert Cobblestone Slab",
-	default.node_sound_stone_defaults()
-)
+-- compatibility function for previous stairs:corner_<subname>
+function stairs.register_corner(
+		subname, recipeitem, groups, images, desc, snds, wat)
 
-stairs.register_stair_and_slab(
-	"desert_stonebrick",
-	"default:desert_stonebrick",
-	{cracky = 2},
-	{"default_desert_stone_brick.png"},
-	"Desert Stone Brick Stair",
-	"Desert Stone Brick Slab",
-	default.node_sound_stone_defaults()
-)
+	stairs.register_stair_outer(
+			subname, recipeitem, groups, images, desc .. " Stair", snds, wat)
+end
 
-stairs.register_stair_and_slab(
-	"desert_stone_block",
-	"default:desert_stone_block",
-	{cracky = 2},
-	{"default_desert_stone_block.png"},
-	"Desert Stone Block Stair",
-	"Desert Stone Block Slab",
-	default.node_sound_stone_defaults()
-)
 
-stairs.register_stair_and_slab(
-	"sandstone",
-	"default:sandstone",
-	{crumbly = 1, cracky = 3},
-	{"default_sandstone.png"},
-	"Sandstone Stair",
-	"Sandstone Slab",
-	default.node_sound_stone_defaults()
-)
+-- Register stairs
+dofile(minetest.get_modpath("stairs") .. "/stairs.lua")
 
-stairs.register_stair_and_slab(
-	"sandstonebrick",
-	"default:sandstonebrick",
-	{cracky = 2},
-	{"default_sandstone_brick.png"},
-	"Sandstone Brick Stair",
-	"Sandstone Brick Slab",
-	default.node_sound_stone_defaults()
-)
 
-stairs.register_stair_and_slab(
-	"sandstone_block",
-	"default:sandstone_block",
-	{cracky = 2},
-	{"default_sandstone_block.png"},
-	"Sandstone Block Stair",
-	"Sandstone Block Slab",
-	default.node_sound_stone_defaults()
-)
-
-stairs.register_stair_and_slab(
-	"desert_sandstone",
-	"default:desert_sandstone",
-	{crumbly = 1, cracky = 3},
-	{"default_desert_sandstone.png"},
-	"Desert Sandstone Stair",
-	"Desert Sandstone Slab",
-	default.node_sound_stone_defaults()
-)
-
-stairs.register_stair_and_slab(
-	"desert_sandstone_brick",
-	"default:desert_sandstone_brick",
-	{cracky = 2},
-	{"default_desert_sandstone_brick.png"},
-	"Desert Sandstone Brick Stair",
-	"Desert Sandstone Brick Slab",
-	default.node_sound_stone_defaults()
-)
-
-stairs.register_stair_and_slab(
-	"desert_sandstone_block",
-	"default:desert_sandstone_block",
-	{cracky = 2},
-	{"default_desert_sandstone_block.png"},
-	"Desert Sandstone Block Stair",
-	"Desert Sandstone Block Slab",
-	default.node_sound_stone_defaults()
-)
-
-stairs.register_stair_and_slab(
-	"silver_sandstone",
-	"default:silver_sandstone",
-	{crumbly = 1, cracky = 3},
-	{"default_silver_sandstone.png"},
-	"Silver Sandstone Stair",
-	"Silver Sandstone Slab",
-	default.node_sound_stone_defaults()
-)
-
-stairs.register_stair_and_slab(
-	"silver_sandstone_brick",
-	"default:silver_sandstone_brick",
-	{cracky = 2},
-	{"default_silver_sandstone_brick.png"},
-	"Silver Sandstone Brick Stair",
-	"Silver Sandstone Brick Slab",
-	default.node_sound_stone_defaults()
-)
-
-stairs.register_stair_and_slab(
-	"silver_sandstone_block",
-	"default:silver_sandstone_block",
-	{cracky = 2},
-	{"default_silver_sandstone_block.png"},
-	"Silver Sandstone Block Stair",
-	"Silver Sandstone Block Slab",
-	default.node_sound_stone_defaults()
-)
-
-stairs.register_stair_and_slab(
-	"obsidian",
-	"default:obsidian",
-	{cracky = 1, level = 2},
-	{"default_obsidian.png"},
-	"Obsidian Stair",
-	"Obsidian Slab",
-	default.node_sound_stone_defaults()
-)
-
-stairs.register_stair_and_slab(
-	"obsidianbrick",
-	"default:obsidianbrick",
-	{cracky = 1, level = 2},
-	{"default_obsidian_brick.png"},
-	"Obsidian Brick Stair",
-	"Obsidian Brick Slab",
-	default.node_sound_stone_defaults()
-)
-
-stairs.register_stair_and_slab(
-	"obsidian_block",
-	"default:obsidian_block",
-	{cracky = 1, level = 2},
-	{"default_obsidian_block.png"},
-	"Obsidian Block Stair",
-	"Obsidian Block Slab",
-	default.node_sound_stone_defaults()
-)
-
-stairs.register_stair_and_slab(
-	"brick",
-	"default:brick",
-	{cracky = 3},
-	{"default_brick.png"},
-	"Brick Stair",
-	"Brick Slab",
-	default.node_sound_stone_defaults()
-)
-
-stairs.register_stair_and_slab(
-	"steelblock",
-	"default:steelblock",
-	{cracky = 1, level = 2},
-	{"default_steel_block.png"},
-	"Steel Block Stair",
-	"Steel Block Slab",
-	default.node_sound_metal_defaults()
-)
-
-stairs.register_stair_and_slab(
-	"copperblock",
-	"default:copperblock",
-	{cracky = 1, level = 2},
-	{"default_copper_block.png"},
-	"Copper Block Stair",
-	"Copper Block Slab",
-	default.node_sound_metal_defaults()
-)
-
-stairs.register_stair_and_slab(
-	"bronzeblock",
-	"default:bronzeblock",
-	{cracky = 1, level = 2},
-	{"default_bronze_block.png"},
-	"Bronze Block Stair",
-	"Bronze Block Slab",
-	default.node_sound_metal_defaults()
-)
-
-stairs.register_stair_and_slab(
-	"goldblock",
-	"default:goldblock",
-	{cracky = 1},
-	{"default_gold_block.png"},
-	"Gold Block Stair",
-	"Gold Block Slab",
-	default.node_sound_metal_defaults()
-)
-
-stairs.register_stair_and_slab(
-	"ice",
-	"default:ice",
-	{cracky = 3, puts_out_fire = 1, cools_lava = 1},
-	{"default_ice.png"},
-	"Ice Stair",
-	"Ice Slab",
-	default.node_sound_glass_defaults()
-)
-
-stairs.register_stair_and_slab(
-	"snowblock",
-	"default:snowblock",
-	{crumbly = 3, puts_out_fire = 1, cools_lava = 1, snowy = 1},
-	{"default_snow.png"},
-	"Snow Block Stair",
-	"Snow Block Slab",
-	default.node_sound_dirt_defaults({
-		footstep = {name = "default_snow_footstep", gain = 0.15},
-		dug = {name = "default_snow_footstep", gain = 0.2},
-		dig = {name = "default_snow_footstep", gain = 0.2}
-	})
-)
+print ("[MOD] Stairs Redo loaded")

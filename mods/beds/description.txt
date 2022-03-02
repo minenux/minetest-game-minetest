@@ -1,0 +1,1 @@
+beds which allows sleep, featured to (auto) skip the night.

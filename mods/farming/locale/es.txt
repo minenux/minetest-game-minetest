@@ -1,0 +1,194 @@
+# Translation of the farming mod by TenPlus1
+# textdomain: farming
+# author: PICCORO Lenz McKAY <mckaygerhard@gmail.com>
+# last update: 2022/Feb/16
+
+###### folder . ######
+
+### init.lua ###
+Seed=Semillas
+
+### compatibility.lua ###
+Banana=Banana
+Banana Leaves=Hojas de banana
+Orange=Naranja
+Strawberry=Fresas
+
+### food.lua ###
+Sugar=Azucar
+Salt=Sal
+Rose Water=Agua de rosa
+Turkish Delight=Delicia turca
+Garlic Bread=Pan de Ajo
+Donut=Dona
+Chocolate Donut=Dona de Chocolate
+Apple Donut=Dona de Manzana
+Porridge=Papilla
+Jaffa Cake=Pastel de Jaffa
+
+### hoes.lua ###
+Hoe=Azadon
+Wooden Hoe=Azadon de Madera
+Stone Hoe=Azadon de Piedra
+Steel Hoe=Azadon de Acero
+Bronze Hoe=Azadon de Bronze
+Mese Hoe=Azadon de Mese
+Diamond Hoe=Azadon de Diamante
+# Surcharge du mod [Toolranks] à faire #
+Hoe Bomb (use or throw on grassy areas to hoe land)=Bomba de azada (usar o arrojar en áreas verdes para cavar tierra)
+Mithril Scythe (Right-click to harvest and replant crops)=Guadaña de mithril (clic derecho para cosechar y replantar cultivos)
+# Surcharge du mod [Toolranks] à faire #
+
+### soil.lua ###
+Soil=Suelo
+Wet Soil=Suelo Seco
+
+### utensils.lua ###
+Wooden Bowl=Cuenco de Madera
+Saucepan=Cacerola
+Cooking Pot=Olla
+Baking Tray=Bandeja Hornear
+Skillet=Sarten
+Mortar and Pestle=Mortero y Maza
+Cutting Board=Tabla de cortar
+Juicer=Exprimidor
+Glass Mixing Bowl=Tazón de mezcla de vidrio
+
+
+###### folder ./crops ######
+
+### barley.lua ###
+Barley Seed=Semillas de Cevada
+Barley=Cevada
+
+### beans.lua ###
+Green Beans=Frijoles Verdes
+Bean Pole (place on soil before planting beans)=Base de frijol (colocar en el suelo antes de plantar frijoles)
+
+### beetroot.lua ###
+Beetroot=Remolacha
+Beetroot Soup=Sopa de Remolacha
+
+### blueberry.lua ###
+Blueberries=Arándanos
+Blueberry Muffin=Muffin de Arándanos
+Blueberry Pie=Pastel de Arándanos
+
+### carrot.lua ##
+Carrot=Zanahoria
+Carrot Juice=Jugo de Zanahoria
+Golden Carrot=Zanahoria Dorada
+
+### chili.lua ###
+Chili Pepper=Chile o ajies
+Bowl of Chili=Tazon de Chile o ajies
+
+### cocoa.lua ###
+Cocoa Beans=Amendras de Cacao
+Cookie=Galleta
+Bar of Dark Chocolate=Barra de Chocolate Negro
+Chocolate Block=Bloque de Chocolate
+
+### coffee.lua ###
+Coffee Beans=Grano de Cafe
+Cup of Coffee=Taza de Cafe
+
+### corn.lua ###
+Corn=Maiz
+Corn on the Cob=Mazorca de Maiz
+Cornstarch=Almidon
+Bottle of Ethanol=Garrafa de Etanol
+
+### cotton.lua ###
+Cotton Seed=Sementes de Algodon
+Cotton=Algodon
+String=Cadena
+
+### cucumber.lua ###
+Cucumber=Pepino
+
+### garlic.lua ###
+Garlic clove=Diente de Ajo
+Garlic=Ajo
+Garlic Braid=Trenza de Ajo
+
+### grapes.lua ###
+Grapes=Uvas
+Trellis (place on soil before planting grapes)=Grade de Ripas (colocar en el suelo antes de plantar las uvas)
+
+### hemp.lua ###
+Hemp Seed=Semilla de Caniamo
+Hemp Leaf=Folha de Caniamo
+Bottle of Hemp Oil=Garrafa de Aceite de Caniamo
+Hemp Fibre=Fibra de Caniamo
+Hemp Block=Bloque de Caniamo
+Hemp Rope=Corda de Caniamo
+
+### melon.lua ###
+Melon Slice=Rebanada de Melon
+Melon=Melon
+
+### onion.lua ###
+Onion=Cebolla
+
+### peas.lua ###
+Pea Pod=Vaina de guisante
+Peas=Gisantes
+Pea Soup=Sopa de Guisantes
+
+### pepper.lua ###
+Peppercorn=Grano de Pimienta
+Pepper=Pimienta
+Ground Pepper=Pimienta Molida
+
+### pinapple.lua ###
+Pineapple Top=Tope de Piña
+Pineapple=Pinia
+Pineapple Ring=Anillo de pinia
+Pineapple Juice=Jugo de pinia
+
+### potato.lua ###
+Potato=Batata
+Baked Potato=Batata Cocida
+Cucumber and Potato Salad=Ensalada de Pepino y Patatas
+
+### pumpkin.lua ###
+Pumpkin Slice=Pedazo de Calabaza
+Jack 'O Lantern (punch to turn on and off)=Jack 'O Lantern (golpea para encender o apagar)
+Scarecrow Bottom=Espantapajaros abajo
+Pumpkin Bread=Pan de Calabaza
+Pumpkin Dough=Masa de Calabaza
+Pumpkin=Calabaza
+
+### raspberry.lua ###
+Raspberries=Frambuesa
+Raspberry Smoothie=Batida de Frambuesa
+
+### rhubarb.lua ###
+Rhubarb=Ruibarbo
+Rhubarb Pie=Torta de Ruibarbo
+
+### ryeoatrice.lua ###
+Rye=Centeno
+Rye seed=Semilla de centeno
+Oat=Avena
+Oat seed=Semilla de avena
+Rice=Arroz
+Rice grains=Granos de arroz
+Rice Bread=PAn de arroz
+Rice Flour=Harina de arroz
+Multigrain Flour=Harina multicereal
+Multigrain Bread=Pan multicereal
+
+### tomato.lua ###
+Tomato=Tomate
+
+### wheat.lua ###
+Wheat Seed=Semillas de Trigo
+Wheat=Trigo
+Straw=Paja
+Flour=Harina
+Bread=Pan
+Sliced Bread=Pan rebanado
+Toast=Tostadas
+Toast Sandwich=Emparedado de tostadas
