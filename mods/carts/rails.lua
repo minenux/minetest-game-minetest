@@ -62,3 +62,9 @@ minetest.register_craft({
 		{"default:steel_ingot", "group:wood", "default:steel_ingot"},
 	}
 })
+
+-- add alias for boost_cart rails
+minetest.register_alias("carts:copperrail", "default:rail")
+minetest.register_alias("boost_cart:copperrail", "default:rail")
+minetest.register_alias("boost_cart:powerrail", "carts:powerrail")
+minetest.register_alias("boost_cart:brakerail", "carts:brakerail")

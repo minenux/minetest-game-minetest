@@ -1,52 +1,67 @@
--- wool/init.lua
-
--- Load support for MT game translation.
-local S = minetest.get_translator("wool")
-
-local dyes = dye.dyes
-
-for i = 1, #dyes do
-	local name, desc = unpack(dyes[i])
-
-	minetest.register_node("wool:" .. name, {
-		description = S(desc .. " Wool"),
-		tiles = {"wool_" .. name .. ".png"},
-		is_ground_content = false,
-		groups = {snappy = 2, choppy = 2, oddly_breakable_by_hand = 3,
-				flammable = 3, wool = 1},
-		sounds = default.node_sound_defaults(),
-	})
-
-	minetest.register_craft{
-		type = "shapeless",
-		output = "wool:" .. name,
-		recipe = {"group:dye,color_" .. name, "group:wool"},
-	}
-end
-
--- Legacy
--- Backwards compatibility with jordach's 16-color wool mod
 minetest.register_alias("wool:dark_blue", "wool:blue")
 minetest.register_alias("wool:gold", "wool:yellow")
 
--- Dummy calls to S() to allow translation scripts to detect the strings.
--- To update this run:
--- for _,e in ipairs(dye.dyes) do print(("S(%q)"):format(e[2].." Wool")) end
+function default.node_wool_defaults(table)
 
---[[
-S("White Wool")
-S("Grey Wool")
-S("Dark Grey Wool")
-S("Black Wool")
-S("Violet Wool")
-S("Blue Wool")
-S("Cyan Wool")
-S("Dark Green Wool")
-S("Green Wool")
-S("Yellow Wool")
-S("Brown Wool")
-S("Orange Wool")
-S("Red Wool")
-S("Magenta Wool")
-S("Pink Wool")
---]]
+	table = table or {}
+
+	table.footstep = table.footstep or
+		{name = "wool_coat_movement", gain = 1.0}
+
+	table.dug = table.dug or
+		{name = "default_dug_node", gain = 0.25}
+
+	table.place = table.place or
+		{name = "default_place_node", gain = 1.0}
+
+	return table
+end
+
+local wool_sound = default.node_wool_defaults()
+--local wool_sound = default.node_sound_defaults()
+
+local wool_dyes = {
+	{"white", "White"},
+	{"grey", "Grey"},
+	{"black", "Black"},
+	{"red", "Red"},
+	{"yellow", "Yellow"},
+	{"green", "Green"},
+	{"cyan", "Cyan"},
+	{"blue", "Blue"},
+	{"magenta", "Magenta"},
+	{"orange", "Orange"},
+	{"violet", "Violet"},
+	{"brown", "Brown"},
+	{"pink", "Pink"},
+	{"dark_grey", "Dark Grey"},
+	{"dark_green", "Dark Green"},
+}
+
+for _, row in pairs(wool_dyes) do
+
+	minetest.register_node("wool:" .. row[1], {
+		description = row[2] .. " Wool",
+		tiles = {"wool_" .. row[1] .. ".png"},
+		groups = {
+			snappy = 2, choppy = 2, oddly_breakable_by_hand = 3,
+			flammable = 3, wool = 1
+		},
+		sounds = wool_sound,
+	})
+
+	minetest.register_craft({
+		type = "shapeless",
+		output = "wool:" .. row[1],
+		recipe = {"dye:" .. row[1], "group:wool"},
+	})
+
+end
+
+minetest.register_craft({
+	type = "fuel",
+	recipe = "group:wool",
+	burntime = 2,
+})
+
+print ("[MOD] Wool mod loaded")

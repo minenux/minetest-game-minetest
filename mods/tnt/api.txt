@@ -1,0 +1,35 @@
+TNT mod API
+
+On load TNT mod will gather two settings from the minetest.conf file:
+
+'enable_tnt' a boolean switch which defaults to enabled in singleplayer and disabled on mulitplayer
+'tnt_radius' an integer which provides the blast radius of a TNT explosion (default: 3)
+
+
+We also have some global functions which can be called by other mods so long as 'tnt' appears in their depends.txt file:
+
+tnt.register_tnt(def)
+
+  'name' name of tnt node to register
+  'description' node description to appear in inventory
+  'tiles' texture table for node
+  'radius' size of damage area to inflict on surrounding nodes
+  'damage_radius' size of area to inflice damage on surrounding entities (defaults to 2x radius)
+
+
+tnt.burn(pos, nodename)
+
+  'pos' position of node to burn/ignite
+  'nodename' the name of the node to burn/ignite (can be nil as it will be gotten)
+
+
+tnt.boom (pos, def)
+
+  'pos' centre position of explosion
+  'def' table definition containing explosion settings:
+     'radius' radius of the explosion which explodes surrounding nodes
+     'damage_radius' radius of explosion damage which causes harm to surrounding entities
+     'ignore_protection' when true will explode protected areas (default: false)
+     'disable_drops' when true will not drop node items (default: false)
+     'explode_center' when true will apply on_boom and drops for center 'pos' node
+     'sound' custom explosion sound (default: "tnt_boom")

@@ -68,7 +68,7 @@ http://creativecommons.org/licenses/by-sa/3.0/
 
 ====================================================
 
-CC0 1.0 Universal (CC0 1.0) Public Domain Dedication 
+CC0 1.0 Universal (CC0 1.0) Public Domain Dedication
 for audio files (found in sounds folder)
 TumeniNodes
 steveygos93
@@ -97,4 +97,3 @@ When using or citing the work, you should not imply endorsement by the author or
 This license is acceptable for Free Cultural Works.
 For more Information:
 https://creativecommons.org/publicdomain/zero/1.0/
-
