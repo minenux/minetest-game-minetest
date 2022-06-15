@@ -1,11 +1,11 @@
 -- boats/init.lua
 
+local is_pa = minetest.get_modpath("player_api")
+
 -- translation support and 5.x version check
 local S, is_50, is_53
 if minetest.get_translator ~= nil then
 	S = minetest.get_translator("boats") -- 5.x translation function
-	is_50 = true
-	is_53 = false
 else
 	if minetest.get_modpath("intllib") then
 		dofile(minetest.get_modpath("intllib") .. "/init.lua")
@@ -25,7 +25,8 @@ else
 	end
 end
 -- check for minetest 5.x compatibility
-is_53 = minetest.has_feature("direct_velocity_on_players") or minetest.has_feature("is_creative_enabled") or false
+is_50 = has_feature("httpfetch_binary_data")
+is_53 = minetest.has_feature("direct_velocity_on_players") or minetest.has_feature("is_creative_enabled") of false
 
 --
 -- Helper functions
@@ -94,7 +95,7 @@ function boat.on_rightclick(self, clicker)
 	if self.driver and name == self.driver then
 		-- Cleanup happens in boat.on_detach_child
 		clicker:set_detach()
-		if is_50 then
+		if is_pa then
 			player_api.set_animation(clicker, "stand", 30)
 		else
 			default.player_set_animation(clicker, "stand", 30)
@@ -109,14 +110,14 @@ function boat.on_rightclick(self, clicker)
 			{x = 0.5, y = 1, z = -3}, {x = 0, y = 0, z = 0})
 
 		self.driver = name
-		if is_50 then
+		if is_pa then
 			player_api.player_attached[name] = true
 		else
 			default.player_attached[name] = true
 		end
 
 		minetest.after(0.2, function()
-			if is_50 then
+			if is_pa then
 				player_api.set_animation(clicker, "sit", 30)
 			else
 				default.player_set_animation(clicker, "sit", 30)
@@ -130,7 +131,7 @@ end
 -- If driver leaves server while driving boat
 function boat.on_detach_child(self, child)
 	if child and child:get_player_name() == self.driver then
-		if is_50 then
+		if is_pa then
 			player_api.player_attached[child:get_player_name()] = false
 		else
 			default.player_attached[child:get_player_name()] = false
@@ -164,7 +165,7 @@ function boat.on_punch(self, puncher)
 	if self.driver and name == self.driver then
 		self.driver = nil
 		puncher:set_detach()
-		if is_50 then
+		if is_pa then
 			player_api.player_attached[name] = false
 		else
 			default.player_attached[name] = false
@@ -309,7 +310,7 @@ function boat.on_step(self, dtime)
 			local driver_objref = minetest.get_player_by_name(self.driver)
 			default.player_attached[self.driver] = false
 			driver_objref:set_detach()
-			if is_50 then
+			if is_pa then
 				player_api.set_animation(driver_objref, "stand" , 30)
 			else
 				default.player_set_animation(driver_objref, "stand" , 30)
