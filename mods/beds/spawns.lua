@@ -50,6 +50,7 @@ function beds.read_spawns()
 end
 
 
+-- load player spawn positions
 beds.read_spawns()
 
 

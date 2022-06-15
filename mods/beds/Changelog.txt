@@ -1,3 +1,10 @@
+NEXT
+----
+
+- add more beds as fuel, add mini-game respawn flag.
+- add new white simple bed, change red bed recipes to use red wool, add my own screenshot
+- older engine detection and intlib
+
 1.0.1 beta
 ----------
 - Add backwards compatibility with PilzAdam's beds mod

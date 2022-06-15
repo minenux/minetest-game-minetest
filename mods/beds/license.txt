@@ -59,3 +59,7 @@ rights may limit how you use the material.
 
 For more details:
 http://creativecommons.org/licenses/by-sa/3.0/
+
+
+WTFPL license applies to bed .obj files by jp from mesh beds mod:
+https://forum.minetest.net/viewtopic.php?t=11817

@@ -319,6 +319,15 @@ end
 -- Only register respawn callback if respawn enabled
 if enable_respawn then
 
+	-- set respawn flag to true by default
+	minetest.register_on_joinplayer(function(player)
+
+		if not player then return end
+
+		local name = player:get_player_name()
+		beds.respawn[name] = true
+	end)
+
 	-- respawn player at bed if enabled and valid position is found
 	minetest.register_on_respawnplayer(function(player)
 
@@ -327,7 +336,8 @@ if enable_respawn then
 		local name = player:get_player_name()
 		local pos = beds.spawn[name]
 
-		if pos then
+		-- check if respawn flag is true (for mini-game support, can be set to false)
+		if pos and beds.respawn[name] then
 			player:set_pos(pos)
 			return true
 		end

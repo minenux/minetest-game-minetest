@@ -8,7 +8,7 @@ For information check [../README.md](../README.md)
 | mod name           | origin or work                                      | version | info |
 | ------------------ | --------------------------------------------------- | -------- | --- |
 | api                | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/eb64ff94f82d726e4a55b20fa7ce30e4a7470cc5 | [api](../game_api.md) |
-| beds               | https://codeberg.org/minenux/minetest-mod-beds      | https://codeberg.org/minenux/minetest-mod-beds/commit/7b6fae96d5e273dad9a373e63eb958145c9bfbef | [beds/README.md](beds/README.md) |
+| beds               | https://codeberg.org/minenux/minetest-mod-beds      | https://codeberg.org/minenux/minetest-mod-beds/commit/a1aac5940c88106b901c00409d7dac942720dd5b | [beds/README.md](beds/README.md) |
 | boats              | https://codeberg.org/minenux/minetest-mod-boats     | https://codeberg.org/minenux/minetest-mod-boats/commit/3832de08f705d5d2e7b5a971760e5fad1653305f | [boats/README.md](boats/README.md) |
 | bucket             | https://codeberg.org/minenux/minetest-mod-bucket.git | https://codeberg.org/minenux/minetest-mod-bucket/commit/1d9f32295aba3ef2a86be302050f34c1766e93d5 | [bucket/README.md](bucket/README.md) |
 | butterflies        | https://codeberg.org/minenux/minetest-mod-bucket.git | https://codeberg.org/minenux/minetest-mod-bucket/commit/1d9f32295aba3ef2a86be302050f34c1766e93d5 | [bucket/README.md](bucket/README.md) |
