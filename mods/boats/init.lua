@@ -25,7 +25,7 @@ else
 	end
 end
 -- check for minetest 5.x compatibility
-is_50 = has_feature("httpfetch_binary_data")
+is_50 = minetest.has_feature("httpfetch_binary_data")
 is_53 = minetest.has_feature("direct_velocity_on_players") or minetest.has_feature("is_creative_enabled") or false
 
 --
