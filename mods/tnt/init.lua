@@ -7,7 +7,7 @@ if enable_tnt == nil then
 end
 
 -- minetest 5.x check
-local mt_50 = minetest.get_translator
+local mt_50 = minetest.has_feature("add_player_velocity")
 
 -- loss probabilities array (one in X will be lost)
 local loss_prob = {}
