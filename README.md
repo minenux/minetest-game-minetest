@@ -59,4 +59,5 @@ For minetest4 check https://codeberg.org/minenux/minetest-engine/src/branch/stab
 
 ## Licensing
 
-See `LICENSE.txt`
+See `LICENSE.txt` original autor fo first set of mods game was Blockmen
+
