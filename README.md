@@ -17,7 +17,7 @@ also a minetest4 game version too in `stable-4.0` branch.
 This are focused to provide minimal default game featured for minetest5 
 to be playable, with an [api](game_api.md) for more aditions (in the form of mods)
 
-For further information, check the [Minetest Wiki](https://wiki.minetest.net/Subgames/Minetest_Game) 
+For further information, check the [Minetest Wiki](https://wiki.minetest.org/index.php?title=Games/Minetest_Game) 
 
 ## Download
 
@@ -31,9 +31,11 @@ When stable releases are made, Minetest Game and the Minetest engine is packaged
 and made available at https://codeberg.org/minenux/minetest-engine/archive/stable-5.2.tar.gz 
 or generally at https://codeberg.org/minenux/minetest-engine/releases/tag/5.2.1 by example.
 
+This have a mirror at https://git.minetest.org/minenux/minetest-game-minetest/releases
+
 ## Installation
 
-This game can be used in any version from 5.0 to 5.2, it may work with 5.3 but not with 5.5
+This game can be used in any version from 5.0 to 5.2, it may work with recents versions
 
 After download, rename the directory decompressed to `minetest_game` and put to the "games" directory:
 
@@ -45,46 +47,15 @@ For further information or help, see: https://wiki.minetest.net/Installing_Mods
 
 ## Content
 
-* api
-* beds
-* butterflies
-* default
-* doors
-* dungeon_loot
-* farming
-* fire
-* give_initial_stuff
-* bucket
-* map
-* bones
-* fireflies
-* player_api
-* stairs
-* wool
-* binoculars
-* carts
-* dye
-* flowers
-* screwdriver
-* tnt
-* xpanes
-* boats
-* creative
-* env_sounds
-* game_commands
-* sethome
-* sfinv
-* spawn
-* weather
-* vessels
-* walls
+This sub game or game will contain a set of mods, that provide a behaviour of the game, 
+For more information check [mods/README.md](mods/README.md)
 
 ## Compatibility
 
-This source code and files are only compatible with matched minetest5 engine
+This source code and files are focused in most newer minetest5 engine
 from https://codeberg.org/minenux/minetest-engine/src/branch/stable-5.2 
-Additionally, when the Minetest5 engine is tagged to be a certain version (e.g.
-5.2.1), Minetest Game is tagged with the version 5.2.1 too.
+
+For minetest4 check https://codeberg.org/minenux/minetest-engine/src/branch/stable-4.0 
 
 ## Licensing
 
