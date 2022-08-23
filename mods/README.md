@@ -5,6 +5,8 @@ For information check [../README.md](../README.md)
 
 ## Content
 
+Most of those mods have mirror at http://git.mirror.org
+
 | mod name           | origin or work                                      | version | info |
 | ------------------ | --------------------------------------------------- | -------- | --- |
 | api                | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/c7cb79422ba19c696966472942db6177c934838d | [api](../game_api.md) |
@@ -38,10 +40,10 @@ pooly provided and better managed by mods like rspawn and spawnrandom.
 
 ## Compatibility
 
-This source code and files are only compatible with matched minetest4 engine
+This source code and files are focused in most olders minetest4 engine or 0.4.X ones 
 from https://codeberg.org/minenux/minetest-engine/src/branch/stable-4.0 
-Additionally, when the Minetest4 engine is tagged to be a certain version (e.g.
-4.0.17), Minetest Game is tagged with the version 4.0.17 too.
+
+For minetest5 check https://codeberg.org/minenux/minetest-engine/src/branch/stable-5.2 
 
 ## Licensing
 
