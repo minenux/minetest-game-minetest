@@ -48,10 +48,8 @@ pooly provided and better managed by mods like rspawn and spawnrandom.
 
 ## Compatibility
 
-This source code and files are only compatible with matched minetest5 engine
+This source code and files are focused in most newer minetest5 engine
 from https://codeberg.org/minenux/minetest-engine/src/branch/stable-5.2 
-Additionally, when the Minetest5 engine is tagged to be a certain version (e.g.
-5.2.1), Minetest Game is tagged with the version 5.2.1 too.
 
 For minetest4 check https://codeberg.org/minenux/minetest-engine/src/branch/stable-4.0 
 
