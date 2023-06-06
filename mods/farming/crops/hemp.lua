@@ -8,14 +8,15 @@ minetest.register_node("farming:seed_hemp", {
 	inventory_image = "farming_hemp_seed.png",
 	wield_image = "farming_hemp_seed.png",
 	drawtype = "signlike",
-	groups = {seed = 1, snappy = 3, attached_node = 1},
+	groups = {seed = 1, snappy = 3, attached_node = 1, growing = 1},
 	paramtype = "light",
 	paramtype2 = "wallmounted",
 	walkable = false,
 	sunlight_propagates = true,
 	selection_box = farming.select,
+	next_plant = "farming:hemp_1",
 	on_place = function(itemstack, placer, pointed_thing)
-		return farming.place_seed(itemstack, placer, pointed_thing, "farming:hemp_1")
+		return farming.place_seed(itemstack, placer, pointed_thing, "farming:seed_hemp")
 	end
 })
 
@@ -101,7 +102,8 @@ minetest.register_node("farming:hemp_block", {
 	description = S("Hemp Block"),
 	tiles = {"farming_hemp_block.png"},
 	paramtype = "light",
-	groups = {snappy = 1, oddly_breakable_by_hand = 1, flammable = 2}
+	groups = {snappy = 1, oddly_breakable_by_hand = 1, flammable = 2},
+	sounds =  default.node_sound_leaves_defaults()
 })
 
 minetest.register_craft( {
@@ -190,6 +192,7 @@ local def = {
 	walkable = false,
 	buildable_to = true,
 	drop = "",
+	waving = 1,
 	selection_box = farming.select,
 	groups = {
 		snappy = 3, flammable = 2, plant = 1, attached_node = 1,
@@ -242,6 +245,7 @@ minetest.register_node("farming:hemp_7", table.copy(def))
 -- stage 8 (final)
 def.tiles = {"farming_hemp_8.png"}
 def.groups.growing = nil
+def.selection_box = farming.select_final
 def.drop = {
 	items = {
 		{items = {"farming:hemp_leaf 2"}, rarity = 1},
@@ -256,7 +260,27 @@ minetest.register_node("farming:hemp_8", table.copy(def))
 farming.registered_plants["farming:hemp"] = {
 	crop = "farming:hemp",
 	seed = "farming:seed_hemp",
-	mminlight = farming.min_light,
+	minlight = farming.min_light,
 	maxlight = farming.max_light,
 	steps = 8
 }
+
+-- mapgen
+minetest.register_decoration({
+	deco_type = "simple",
+	place_on = {"default:dirt_with_grass", "default:dirt_with_rainforest_litter"},
+	sidelen = 16,
+	noise_params = {
+		offset = 0,
+		scale = farming.hemp,
+		spread = {x = 100, y = 100, z = 100},
+		seed = 420,
+		octaves = 3,
+		persist = 0.6
+	},
+	y_min = 3,
+	y_max = 45,
+	decoration = "farming:hemp_7",
+	spawn_by = "group:tree",
+	num_spawn_by = 1
+})

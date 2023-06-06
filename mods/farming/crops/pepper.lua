@@ -113,6 +113,7 @@ minetest.register_node("farming:pepper_4", table.copy(def))
 
 -- stage 5 (green pepper)
 def.tiles = {"crops_pepper_plant_5.png"}
+def.selection_box = farming.select_final
 def.drop = {
 	max_items = 2, items = {
 		{items = {"farming:pepper 2"}, rarity = 1},
@@ -153,3 +154,29 @@ farming.registered_plants["farming:pepper"] = {
 	maxlight = farming.max_light,
 	steps = 5
 }
+
+-- mapgen
+local mg = farming.mapgen == "v6"
+
+def = {
+	grow_on = mg and {"default:dirt_with_grass"} or {"default:dirt_with_rainforest_litter"}
+}
+
+minetest.register_decoration({
+	deco_type = "simple",
+	place_on = def.grow_on,
+	sidelen = 16,
+	noise_params = {
+		offset = 0,
+		scale = farming.pepper,
+		spread = {x = 100, y = 100, z = 100},
+		seed = 243,
+		octaves = 3,
+		persist = 0.6
+	},
+	y_min = 5,
+	y_max = 35,
+	decoration = {"farming:pepper_5", "farming:pepper_6", "farming:pepper_7"},
+	spawn_by = "group:tree",
+	num_spawn_by = 1
+})

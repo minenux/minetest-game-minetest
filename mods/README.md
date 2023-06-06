@@ -19,7 +19,7 @@ Most of those mods have mirror at http://git.mirror.org
 | default            | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/c7cb79422ba19c696966472942db6177c934838d | |
 | doors              | https://codeberg.org/minenux/minetest-mod-doors     | https://codeberg.org/minenux/minetest-mod-doors/commit/a89ab0454deb4933b6e4971c57055c40b7938e5b | [doors/README.md](doors/README.md) |
 | dye                | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/c7cb79422ba19c696966472942db6177c934838d | |
-| farming            | https://codeberg.org/minenux/minetest-mod-farming   | https://codeberg.org/minenux/minetest-mod-farming/commit/00e4b3cb89d3c1b1d66b6af4821191c1d667e1bc | [farming/README.md](farming/README.md) |
+| farming            | https://codeberg.org/minenux/minetest-mod-farming   | https://codeberg.org/minenux/minetest-mod-farming/commit/08c3a9b37bab5d8a0f5971b168aef412db5fc424 | [farming/README.md](farming/README.md) |
 | fire               | https://codeberg.org/minenux/minetest-mod-fire      | https://codeberg.org/minenux/minetest-mod-fire/commit/4e5f7ad55314bd9b126fb133cfc5a32fa58b20d2 | [fire/README.md](fire/README.md) |
 | flowers            | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/c7cb79422ba19c696966472942db6177c934838d | |
 | give_initial_stuff | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/c7cb79422ba19c696966472942db6177c934838d | |

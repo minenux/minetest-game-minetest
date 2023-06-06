@@ -7,15 +7,20 @@
 
 farming = {
 	mod = "redo",
-	version = "20220309",
+	version = "20230407",
 	path = minetest.get_modpath("farming"),
 	select = {
 		type = "fixed",
 		fixed = {-0.5, -0.5, -0.5, 0.5, -5/16, 0.5}
 	},
+	select_final = {
+		type = "fixed",
+		fixed = {-0.5, -0.5, -0.5, 0.5, -2.5/16, 0.5}
+	},
 	registered_plants = {},
 	min_light = 12,
-	max_light = 15
+	max_light = 15,
+	mapgen = minetest.get_mapgen_setting("mg_name")
 }
 
 
@@ -103,7 +108,7 @@ end
 
 -- Growth Logic
 local STAGE_LENGTH_AVG = tonumber(
-		minetest.settings:get("farming_stage_length")) or 200 -- 160
+		minetest.settings:get("farming_stage_length")) or 200
 local STAGE_LENGTH_DEV = STAGE_LENGTH_AVG / 6
 
 
@@ -193,30 +198,30 @@ local function reg_plant_stages(plant_name, stage, force_last)
 			local old_constr = node_def.on_construct
 			local old_destr  = node_def.on_destruct
 
-			minetest.override_item(node_name,
-				{
-					on_construct = function(pos)
+			minetest.override_item(node_name, {
 
-						if old_constr then
-							old_constr(pos)
-						end
+				on_construct = function(pos)
 
-						farming.handle_growth(pos)
-					end,
+					if old_constr then
+						old_constr(pos)
+					end
 
-					on_destruct = function(pos)
+					farming.handle_growth(pos)
+				end,
 
-						minetest.get_node_timer(pos):stop()
+				on_destruct = function(pos)
 
-						if old_destr then
-							old_destr(pos)
-						end
-					end,
+					minetest.get_node_timer(pos):stop()
 
-					on_timer = function(pos, elapsed)
-						return farming.plant_growth_timer(pos, elapsed, node_name)
-					end,
-				})
+					if old_destr then
+						old_destr(pos)
+					end
+				end,
+
+				on_timer = function(pos, elapsed)
+					return farming.plant_growth_timer(pos, elapsed, node_name)
+				end,
+			})
 		end
 
 	elseif force_last then
@@ -302,12 +307,32 @@ end)
 -- Just in case a growing type or added node is missed (also catches existing
 -- nodes added to map before timers were incorporated).
 minetest.register_abm({
+	label = "Start crop timer",
 	nodenames = {"group:growing"},
 	interval = 300,
 	chance = 1,
 	catch_up = false,
 	action = function(pos, node)
-		farming.handle_growth(pos, node)
+
+		-- check if group:growing node is a seed
+		local def = minetest.registered_nodes[node.name]
+
+		if def and def.groups and def.groups.seed then
+
+			local next_stage = def.next_plant
+
+			def = minetest.registered_nodes[next_stage]
+
+			-- change seed to stage_1 or crop
+			if def then
+
+				local p2 = def.place_param2 or 1
+
+				minetest.set_node(pos, {name = next_stage, param2 = p2})
+			end
+		else
+			farming.handle_growth(pos, node)
+		end
 	end
 })
 
@@ -366,8 +391,8 @@ function farming.plant_growth_timer(pos, elapsed, node_name)
 
 		growth = 1
 	else
-		local night_light  = (minetest.get_node_light(light_pos, 0) or 0)
-		local day_light    = (minetest.get_node_light(light_pos, 0.5) or 0)
+		local night_light = (minetest.get_node_light(light_pos, 0) or 0)
+		local day_light = (minetest.get_node_light(light_pos, 0.5) or 0)
 		local night_growth = night_light >= MIN_LIGHT and night_light <= MAX_LIGHT
 		local day_growth = day_light >= MIN_LIGHT and day_light <= MAX_LIGHT
 
@@ -410,6 +435,9 @@ function farming.refill_plant(player, plantname, index)
 	if not player then return end
 
 	local inv = player:get_inventory()
+
+	if not inv then return end
+
 	local old_stack = inv:get_stack("main", index)
 
 	if old_stack:get_name() ~= "" then
@@ -533,19 +561,19 @@ farming.register_plant = function(name, def)
 		inventory_image = def.inventory_image,
 		wield_image = def.inventory_image,
 		drawtype = "signlike",
-		groups = {seed = 1, snappy = 3, attached_node = 1, flammable = 2},
+		groups = {seed = 1, snappy = 3, attached_node = 1, flammable = 2, growing = 1},
 		paramtype = "light",
 		paramtype2 = "wallmounted",
 		walkable = false,
 		sunlight_propagates = true,
 		selection_box = farming.select,
-		place_param2 = def.place_param2 or nil,
+		place_param2 = 1, -- place seed flat
 		next_plant = mname .. ":" .. pname .. "_1",
 
 		on_place = function(itemstack, placer, pointed_thing)
-			return farming.place_seed(itemstack, placer,
-				pointed_thing, mname .. ":" .. pname .. "_1")
-		end,
+			return farming.place_seed(itemstack, placer, pointed_thing,
+					mname .. ":seed_" .. pname)
+		end
 	})
 
 	-- Register harvest
@@ -571,13 +599,16 @@ farming.register_plant = function(name, def)
 			}
 		}
 
+		local sel = farming.select
 		local g = {
 			snappy = 3, flammable = 2, plant = 1, growing = 1,
 			attached_node = 1, not_in_creative_inventory = 1,
 		}
 
 		-- Last step doesn't need growing=1 so Abm never has to check these
+		-- also increase selection box for visual indication plant has matured
 		if i == def.steps then
+			sel = farming.select_final
 			g.growing = 0
 		end
 
@@ -600,7 +631,7 @@ farming.register_plant = function(name, def)
 			buildable_to = true,
 			sunlight_propagates = true,
 			drop = drop,
-			selection_box = farming.select,
+			selection_box = sel,
 			groups = g,
 			sounds = default.node_sound_leaves_defaults(),
 			minlight = def.minlight,
@@ -624,6 +655,9 @@ end
 
 
 -- default settings
+farming.asparagus = 0.002
+farming.eggplant = 0.002
+farming.spinach = 0.002
 farming.carrot = 0.001
 farming.potato = 0.001
 farming.tomato = 0.001
@@ -656,9 +690,10 @@ farming.lettuce = 0.001
 farming.artichoke = 0.001
 farming.parsley = 0.002
 farming.sunflower = 0.001
+farming.ginger = 0.002
+farming.strawberry = not minetest.get_modpath("ethereal") and 0.002
 farming.grains = true
 farming.rice = true
-farming.rarety = 0.002
 
 
 -- Load new global settings if found inside mod folder
@@ -731,8 +766,17 @@ ddoo("lettuce.lua", farming.lettuce)
 ddoo("artichoke.lua", farming.artichoke)
 ddoo("parsley.lua", farming.parsley)
 ddoo("sunflower.lua", farming.sunflower)
+ddoo("strawberry.lua", farming.strawberry)
+ddoo("asparagus.lua", farming.asparagus)
+ddoo("eggplant.lua", farming.eggplant)
+ddoo("spinach.lua", farming.eggplant)
+ddoo("ginger.lua", farming.ginger)
 
 dofile(farming.path .. "/food.lua")
-dofile(farming.path .. "/mapgen.lua")
 dofile(farming.path .. "/compatibility.lua") -- Farming Plus compatibility
-dofile(farming.path .. "/lucky_block.lua")
+
+if minetest.get_modpath("lucky_block") then
+	dofile(farming.path .. "/lucky_block.lua")
+end
+
+print("[MOD] Farming Redo loaded")

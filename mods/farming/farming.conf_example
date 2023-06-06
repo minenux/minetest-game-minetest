@@ -6,6 +6,9 @@
 --]]
 
 -- true to enable crop/food in-game and on mapgen set spawn rarety
+farming.asparagus = 0.002
+farming.eggplant = 0.002
+farming.spinach = 0.002
 farming.carrot = 0.001
 farming.potato = 0.001
 farming.tomato = 0.001
@@ -38,11 +41,10 @@ farming.vanilla = 0.001
 farming.artichoke = 0.001
 farming.parsley = 0.002
 farming.sunflower = 0.001
+farming.ginger = 0.002
+farming.strawberry = not minetest.get_modpath("ethereal") and 0.002
 farming.grains = true -- true or false only
 farming.rice = true
-
--- default rarety of crops on map (higher number = more crops)
-farming.rarety = 0.002
 
 -- default minimum and maximum light levels crops need to grow
 farming.min_light = 12

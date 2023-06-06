@@ -36,6 +36,12 @@ minetest.register_craft({
 	replacements = {{"farming:pot", "farming:pot"}}
 })
 
+-- yellow dye
+minetest.register_craft({
+	output = "dye:yellow",
+	recipe = {{"group:food_onion"}}
+})
+
 -- crop definition
 local def = {
 	drawtype = "plantlike",
@@ -48,6 +54,7 @@ local def = {
 	walkable = false,
 	buildable_to = true,
 	drop = "",
+	waving = 1,
 	selection_box = farming.select,
 	groups = {
 		snappy = 3, flammable = 3, plant = 1, attached_node = 1,
@@ -74,6 +81,7 @@ minetest.register_node("farming:onion_4", table.copy(def))
 -- stage 5
 def.tiles = {"crops_onion_plant_5.png"}
 def.groups.growing = nil
+def.selection_box = farming.select_final
 def.drop = {
 	max_items = 5, items = {
 		{items = {"farming:onion"}, rarity = 1},
@@ -93,3 +101,21 @@ farming.registered_plants["farming:onion"] = {
 	maxlight = farming.max_light,
 	steps = 5
 }
+
+-- mapgen
+minetest.register_decoration({
+	deco_type = "simple",
+	place_on = {"default:dirt_with_grass"},
+	sidelen = 16,
+	noise_params = {
+		offset = 0,
+		scale = farming.onion,
+		spread = {x = 100, y = 100, z = 100},
+		seed = 912,
+		octaves = 3,
+		persist = 0.6
+	},
+	y_min = 5,
+	y_max = 28,
+	decoration = "farming:onion_5"
+})

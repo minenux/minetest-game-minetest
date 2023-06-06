@@ -79,7 +79,7 @@ minetest.register_node("farming:melon_8", {
 		"farming_melon_side.png"
 	},
 	groups = {
-		food_melon = 1, snappy = 2, oddly_breakable_by_hand = 1,
+		food_melon = 1, snappy = 3, choppy = 3, oddly_breakable_by_hand = 2,
 		flammable = 2, plant = 1
 	},
 	drop = "farming:melon_8",
@@ -96,3 +96,33 @@ farming.registered_plants["farming:melon"] = {
 	maxlight = farming.max_light,
 	steps = 8
 }
+
+-- mapgen
+local mg = farming.mapgen == "v6"
+
+def = {
+	y_max = mg and 20 or 6,
+	spawn_on = mg and {"default:dirt_with_grass"} or {"default:dirt_with_dry_grass",
+			"default:dirt_with_rainforest_litter"},
+	near = mg and "group:water" or nil,
+	num = mg and 1 or -1,
+}
+
+minetest.register_decoration({
+	deco_type = "simple",
+	place_on = def.spawn_on,
+	sidelen = 16,
+	noise_params = {
+		offset = 0,
+		scale = farming.melon,
+		spread = {x = 100, y = 100, z = 100},
+		seed = 790,
+		octaves = 3,
+		persist = 0.6
+	},
+	y_min = 1,
+	y_max = def.y_max,
+	decoration = "farming:melon_8",
+	spawn_by = def.near,
+	num_spawn_by = def.num
+})

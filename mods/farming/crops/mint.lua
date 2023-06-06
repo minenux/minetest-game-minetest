@@ -2,13 +2,21 @@
 local S = farming.intllib
 
 -- mint seed
-minetest.register_craftitem("farming:seed_mint", {
+minetest.register_node("farming:seed_mint", {
 	description = S("Mint Seeds"),
+	tiles = {"farming_mint_seeds.png"},
 	inventory_image = "farming_mint_seeds.png",
-	groups = {seed = 2, flammable = 2},
+	wield_image = "farming_mint_seeds.png",
+	drawtype = "signlike",
+	groups = {seed = 1, snappy = 3, attached_node = 1, growing = 1, flammable = 2},
+	paramtype = "light",
+	paramtype2 = "wallmounted",
+	walkable = false,
+	sunlight_propagates = true,
+	selection_box = farming.select,
+	next_plant = "farming:mint_1",
 	on_place = function(itemstack, placer, pointed_thing)
-		return farming.place_seed(
-				itemstack, placer, pointed_thing, "farming:mint_1")
+		return farming.place_seed(itemstack, placer, pointed_thing, "farming:seed_mint")
 	end
 })
 
@@ -47,6 +55,7 @@ local def = {
 	walkable = false,
 	buildable_to = true,
 	drop = "",
+	waving = 1,
 	selection_box = farming.select,
 	groups = {
 		snappy = 3, flammable = 2, plant = 1, attached_node = 1,
@@ -69,6 +78,7 @@ minetest.register_node("farming:mint_3", table.copy(def))
 -- stage 4 (final)
 def.tiles = {"farming_mint_4.png"}
 def.groups.growing = nil
+def.selection_box = farming.select_final
 def.drop = {
 	items = {
 		{items = {"farming:mint_leaf 2"}, rarity = 1},
@@ -87,3 +97,23 @@ farming.registered_plants["farming:mint"] = {
 	maxlight = farming.max_light,
 	steps = 4
 }
+
+-- mapgen
+minetest.register_decoration({
+	deco_type = "simple",
+	place_on = {"default:dirt_with_grass", "default:dirt_with_coniferous_litter"},
+	sidelen = 16,
+	noise_params = {
+		offset = 0,
+		scale = farming.mint,
+		spread = {x = 100, y = 100, z = 100},
+		seed = 801,
+		octaves = 3,
+		persist = 0.6
+	},
+	y_min = 0,
+	y_max = 75,
+	decoration = "farming:mint_4",
+	spawn_by = {"group:water", "group:sand"},
+	num_spawn_by = 1
+})
