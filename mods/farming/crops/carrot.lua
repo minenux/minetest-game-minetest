@@ -46,11 +46,7 @@ minetest.register_craftitem("farming:carrot_gold", {
 
 minetest.register_craft({
 	output = "farming:carrot_gold",
-	recipe = {
-		{"", "default:gold_lump", ""},
-		{"default:gold_lump", "group:food_carrot", "default:gold_lump"},
-		{"", "default:gold_lump", ""}
-	}
+	recipe = {{"group:food_carrot", "default:gold_lump"}}
 })
 
 -- carrot definition
@@ -62,6 +58,7 @@ local def = {
 	walkable = false,
 	buildable_to = true,
 	drop = "",
+	waving = 1,
 	selection_box = farming.select,
 	groups = {
 		snappy = 3, flammable = 2, plant = 1, attached_node = 1,
@@ -107,6 +104,7 @@ minetest.register_node("farming:carrot_7", table.copy(def))
 -- stage 8 (final)
 def.tiles = {"farming_carrot_8.png"}
 def.groups.growing = nil
+def.selection_box = farming.select_final
 def.drop = {
 	items = {
 		{items = {"farming:carrot 2"}, rarity = 1},
@@ -123,3 +121,31 @@ farming.registered_plants["farming:carrot"] = {
 	maxlight = farming.max_light,
 	steps = 8
 }
+
+-- mapgen
+local mg = farming.mapgen == "v6"
+
+def = {
+	y_max = mg and 30 or 20,
+	near = mg and "group:water" or nil,
+	num = mg and 1 or -1,
+}
+
+minetest.register_decoration({
+	deco_type = "simple",
+	place_on = {"default:dirt_with_grass"},
+	sidelen = 16,
+	noise_params = {
+		offset = 0,
+		scale = farming.carrot,
+		spread = {x = 100, y = 100, z = 100},
+		seed = 890,
+		octaves = 3,
+		persist = 0.6
+	},
+	y_min = 1,
+	y_max = def.y_max,
+	decoration = "farming:carrot_8",
+	spawn_by = def.near,
+	num_spawn_by = def.num
+})

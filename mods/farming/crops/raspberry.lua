@@ -61,6 +61,7 @@ minetest.register_node("farming:raspberry_3", table.copy(def))
 -- stage 4 (final)
 def.tiles = {"farming_raspberry_4.png"}
 def.groups.growing = nil
+def.selection_box = farming.select_final
 def.drop = {
 	items = {
 		{items = {"farming:raspberries 2"}, rarity = 1},
@@ -78,3 +79,21 @@ farming.registered_plants["farming:raspberries"] = {
 	maxlight = farming.max_light,
 	steps = 4
 }
+
+-- mapgen
+minetest.register_decoration({
+	deco_type = "simple",
+	place_on = {"default:dirt_with_grass"},
+	sidelen = 16,
+	noise_params = {
+		offset = 0,
+		scale = farming.raspberry,
+		spread = {x = 100, y = 100, z = 100},
+		seed = 687,
+		octaves = 3,
+		persist = 0.6
+	},
+	y_min = 3,
+	y_max = 15,
+	decoration = "farming:raspberry_4"
+})

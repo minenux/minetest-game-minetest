@@ -52,6 +52,7 @@ local def = {
 	walkable = false,
 	buildable_to = true,
 	drop = "",
+	waving = 1,
 	selection_box = farming.select,
 	groups = {
 		snappy = 3, flammable = 2, plant = 1, attached_node = 1,
@@ -78,6 +79,7 @@ minetest.register_node("farming:coffee_4", table.copy(def))
 -- stage 5 (final)
 def.tiles = {"farming_coffee_5.png"}
 def.groups.growing = nil
+def.selection_box = farming.select_final
 def.drop = {
 	items = {
 		{items = {"farming:coffee_beans 2"}, rarity = 1},
@@ -95,3 +97,29 @@ farming.registered_plants["farming:coffee"] = {
 	maxlight = farming.max_light,
 	steps = 5
 }
+
+-- mapgen
+local mg = farming.mapgen == "v6"
+
+def = {
+	y_max = mg and 50 or 55,
+	spawn_on = mg and {"default:dirt_with_grass"} or {"default:dirt_with_dry_grass",
+			"default:dirt_with_rainforest_litter", "default:dry_dirt_with_dry_grass"}
+}
+
+minetest.register_decoration({
+	deco_type = "simple",
+	place_on = def.spawn_on,
+	sidelen = 16,
+	noise_params = {
+		offset = 0,
+		scale = farming.coffee,
+		spread = {x = 100, y = 100, z = 100},
+		seed = 12,
+		octaves = 3,
+		persist = 0.6
+	},
+	y_min = 20,
+	y_max = def.y_max,
+	decoration = "farming:coffee_5"
+})

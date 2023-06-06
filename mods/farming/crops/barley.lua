@@ -8,14 +8,15 @@ minetest.register_node("farming:seed_barley", {
 	inventory_image = "farming_barley_seed.png",
 	wield_image = "farming_barley_seed.png",
 	drawtype = "signlike",
-	groups = {seed = 1, snappy = 3, attached_node = 1},
+	groups = {seed = 1, snappy = 3, attached_node = 1, growing = 1},
 	paramtype = "light",
 	paramtype2 = "wallmounted",
 	walkable = false,
 	sunlight_propagates = true,
+	next_plant = "farming:barley_1",
 	selection_box = farming.select,
 	on_place = function(itemstack, placer, pointed_thing)
-		return farming.place_seed(itemstack, placer, pointed_thing, "farming:barley_1")
+		return farming.place_seed(itemstack, placer, pointed_thing, "farming:seed_barley")
 	end
 })
 
@@ -47,6 +48,7 @@ local def = {
 	walkable = false,
 	buildable_to = true,
 	drop = "",
+	waving = 1,
 	selection_box = farming.select,
 	groups = {
 		snappy = 3, flammable = 2, plant = 1, attached_node = 1,
@@ -72,12 +74,6 @@ minetest.register_node("farming:barley_4", table.copy(def))
 
 -- stage 5
 def.tiles = {"farming_barley_5.png"}
-def.drop = {
-	items = {
-		{items = {"farming:barley"}, rarity = 2},
-		{items = {"farming:seed_barley"}, rarity = 2}
-	}
-}
 minetest.register_node("farming:barley_5", table.copy(def))
 
 -- stage 6
@@ -85,14 +81,25 @@ def.tiles = {"farming_barley_6.png"}
 def.drop = {
 	items = {
 		{items = {"farming:barley"}, rarity = 2},
-		{items = {"farming:seed_barley"}, rarity = 1}
+		{items = {"farming:seed_barley"}, rarity = 2}
 	}
 }
 minetest.register_node("farming:barley_6", table.copy(def))
 
--- stage 7 (final)
+-- stage 7
 def.tiles = {"farming_barley_7.png"}
+def.drop = {
+	items = {
+		{items = {"farming:barley"}, rarity = 2},
+		{items = {"farming:seed_barley"}, rarity = 1}
+	}
+}
+minetest.register_node("farming:barley_7", table.copy(def))
+
+-- stage 8 (final)
+def.tiles = {"farming_barley_8.png"}
 def.groups.growing = nil
+def.selection_box = farming.select_final
 def.drop = {
 	items = {
 		{items = {"farming:barley"}, rarity = 1},
@@ -101,7 +108,7 @@ def.drop = {
 		{items = {"farming:seed_barley"}, rarity = 3}
 	}
 }
-minetest.register_node("farming:barley_7", table.copy(def))
+minetest.register_node("farming:barley_8", table.copy(def))
 
 -- add to registered_plants
 farming.registered_plants["farming:barley"] = {
@@ -109,7 +116,7 @@ farming.registered_plants["farming:barley"] = {
 	seed = "farming:seed_barley",
 	minlight = farming.min_light,
 	maxlight = farming.max_light,
-	steps = 7
+	steps = 8
 }
 
 -- Fuel

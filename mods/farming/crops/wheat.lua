@@ -8,14 +8,15 @@ minetest.register_node("farming:seed_wheat", {
 	inventory_image = "farming_wheat_seed.png",
 	wield_image = "farming_wheat_seed.png",
 	drawtype = "signlike",
-	groups = {seed = 1, snappy = 3, attached_node = 1, flammable = 4},
+	groups = {seed = 1, snappy = 3, attached_node = 1, flammable = 4, growing = 1},
 	paramtype = "light",
 	paramtype2 = "wallmounted",
 	walkable = false,
 	sunlight_propagates = true,
 	selection_box = farming.select,
+	next_plant = "farming:wheat_1",
 	on_place = function(itemstack, placer, pointed_thing)
-		return farming.place_seed(itemstack, placer, pointed_thing, "farming:wheat_1")
+		return farming.place_seed(itemstack, placer, pointed_thing, "farming:seed_wheat")
 	end
 })
 
@@ -158,6 +159,7 @@ local def = {
 	walkable = false,
 	buildable_to = true,
 	drop = "",
+	waving = 1,
 	selection_box = farming.select,
 	groups = {
 		snappy = 3, flammable = 4, plant = 1, attached_node = 1,
@@ -216,6 +218,7 @@ minetest.register_node("farming:wheat_7", table.copy(def))
 -- stage 8 (final)
 def.tiles = {"farming_wheat_8.png"}
 def.groups.growing = nil
+def.selection_box = farming.select_final
 def.drop = {
 	items = {
 		{items = {"farming:wheat"}, rarity = 1},

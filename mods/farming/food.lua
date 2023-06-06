@@ -2,6 +2,7 @@
 local S = farming.intllib
 
 --= filter sea water into river water
+
 minetest.register_craft({
 	output = "bucket:bucket_river_water",
 	recipe = {
@@ -67,18 +68,40 @@ minetest.register_craft({
 	recipe = "default:papyrus"
 })
 
+minetest.register_node("farming:sugar_cube", {
+	description = S("Sugar Cube"),
+	tiles = {"farming_sugar_cube.png"},
+	groups = {crumbly = 2},
+	floodable = true,
+	sounds = default.node_sound_gravel_defaults()
+})
+
+minetest.register_craft({
+	output = "farming:sugar_cube",
+	recipe = {
+		{"farming:sugar", "farming:sugar", "farming:sugar"},
+		{"farming:sugar", "farming:sugar", "farming:sugar"},
+		{"farming:sugar", "farming:sugar", "farming:sugar"}
+	}
+})
+
+minetest.register_craft({
+	output = "farming:sugar 9",
+	recipe = {{"farming:sugar_cube"}}
+})
+
 --= Sugar caramel
 
 minetest.register_craftitem("farming:caramel", {
 	description = S("Caramel"),
-	inventory_image = "farming_caramel.png",
+	inventory_image = "farming_caramel.png"
 })
 
 minetest.register_craft({
 	type = "cooking",
 	cooktime = 6,
 	output = "farming:caramel",
-	recipe = "group:food_sugar",
+	recipe = "group:food_sugar"
 })
 
 --= Salt
@@ -165,8 +188,9 @@ minetest.register_node("farming:salt_crystal", {
 	selection_box = {
 		type = "fixed",
 		fixed = {-0.25, -0.5, -0.25, 0.25, 0.3, 0.25}
-	},
+	}
 })
+
 minetest.register_craft({
 	output = "farming:salt 9",
 	recipe = {
@@ -233,6 +257,7 @@ minetest.register_craft({
 		{"group:food_sugar", "dye:pink", "group:food_sugar"}
 	},
 	replacements = {
+		{"group:food_cornstarch", "farming:bowl"},
 		{"group:food_cornstarch", "farming:bowl"},
 		{"group:food_rose_water", "vessels:glass_bottle"}
 	}
@@ -328,7 +353,7 @@ minetest.register_craftitem("farming:jaffa_cake", {
 })
 
 minetest.register_craft({
-	output = "farming:jaffa_cake",
+	output = "farming:jaffa_cake 3",
 	recipe = {
 		{"farming:baking_tray", "group:food_egg", "group:food_sugar"},
 		{"group:food_flour", "group:food_cocoa", "group:food_orange"},
@@ -337,7 +362,8 @@ minetest.register_craft({
 	replacements = {
 		{"farming:baking_tray", "farming:baking_tray"},
 		{"mobs:bucket_milk", "bucket:bucket_empty"},
-		{"farming:soy_milk", "vessels:drining_glass"}
+		{"mobs:wooden_bucket_milk", "wooden_bucket:bucket_wood_empty"},
+		{"farming:soy_milk", "vessels:drinking_glass"}
 	}
 })
 
@@ -366,13 +392,9 @@ minetest.register_craftitem("farming:cactus_juice", {
 	groups = {vessel = 1, drink = 1},
 	on_use = function(itemstack, user, pointed_thing)
 		if user then
-			if math.random(5) == 1 then
-				return minetest.do_item_eat(-1, "vessels:drinking_glass",
-						itemstack, user, pointed_thing)
-			else
-				return minetest.do_item_eat(2, "vessels:drinking_glass",
-						itemstack, user, pointed_thing)
-			end
+			local num = math.random(5) == 1 and -1 or 2
+			return minetest.do_item_eat(num, "vessels:drinking_glass",
+					itemstack, user, pointed_thing)
 		end
 	end
 })
@@ -413,6 +435,21 @@ minetest.register_craft({
 	replacements = {
 		{"group:food_mixing_bowl", "farming:mixing_bowl"},
 		{"group:food_oil", "vessels:glass_bottle"}
+	}
+})
+
+-- Mac & Cheese
+
+minetest.register_craftitem("farming:mac_and_cheese", {
+	description = S("Mac & Cheese"),
+	inventory_image = "farming_mac_and_cheese.png",
+	on_use = minetest.item_eat(6, "farming:bowl")
+})
+
+minetest.register_craft({
+	output = "farming:mac_and_cheese",
+	recipe = {
+		{"group:food_pasta", "group:food_cheese", "group:food_bowl"}
 	}
 })
 
@@ -585,7 +622,8 @@ minetest.register_craft({
 	},
 	replacements = {
 		{"cucina_vegana:soy_milk", "vessels:drinking_glass"},
-		{"group:food_milk", "bucket:bucket_empty"},
+		{"mobs:bucket_milk", "bucket:bucket_empty"},
+		{"mobs:wooden_bucket_milk", "wooden_bucket:bucket_wood_empty"},
 		{"farming:vanilla_extract", "vessels:glass_bottle"}
 	}
 })
@@ -630,7 +668,7 @@ minetest.register_craft({
 -- Onigiri
 
 minetest.register_craftitem("farming:onigiri", {
-	description = S("Onirigi"),
+	description = S("Onigiri"),
 	inventory_image = "farming_onigiri.png",
 	on_use = minetest.item_eat(2),
 	groups = {flammable = 2}

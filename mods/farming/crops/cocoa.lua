@@ -207,6 +207,9 @@ farming.registered_plants["farming:cocoa_beans"] = {
 	steps = 4
 }
 
+-- localize math.random for speed
+local random = math.random
+
 -- add random cocoa pods to jungle tree's
 minetest.register_on_generated(function(minp, maxp)
 
@@ -224,7 +227,7 @@ minetest.register_on_generated(function(minp, maxp)
 		if minetest.find_node_near(pos, 1,
 			{"default:jungleleaves", "moretrees:jungletree_leaves_green"}) then
 
-			dir = math.random(1, 40)
+			dir = random(80)
 
 			    if dir == 1 then pos.x = pos.x + 1
 			elseif dir == 2 then pos.x = pos.x - 1
@@ -239,7 +242,7 @@ minetest.register_on_generated(function(minp, maxp)
 --print ("Cocoa Pod added at " .. minetest.pos_to_string(pos))
 
 				minetest.swap_node(pos, {
-					name = "farming:cocoa_" .. tostring(math.random(4))
+					name = "farming:cocoa_" .. tostring(random(4))
 				})
 			end
 		end

@@ -190,29 +190,29 @@ farming.register_hoe(":farming:hoe_diamond", {
 -- Toolranks support
 if tr then
 
-minetest.override_item("farming:hoe_wood", {
-	original_description = "Wood Hoe",
-	description = toolranks.create_description("Wood Hoe")})
+	minetest.override_item("farming:hoe_wood", {
+		original_description = S("Wood Hoe"),
+		description = toolranks.create_description(S("Wood Hoe"))})
 
-minetest.override_item("farming:hoe_stone", {
-	original_description = "Stone Hoe",
-	description = toolranks.create_description("Stone Hoe")})
+	minetest.override_item("farming:hoe_stone", {
+		original_description = S("Stone Hoe"),
+		description = toolranks.create_description(S("Stone Hoe"))})
 
-minetest.override_item("farming:hoe_steel", {
-	original_description = "Steel Hoe",
-	description = toolranks.create_description("Steel Hoe")})
+	minetest.override_item("farming:hoe_steel", {
+		original_description = S("Steel Hoe"),
+		description = toolranks.create_description(S("Steel Hoe"))})
 
-minetest.override_item("farming:hoe_bronze", {
-	original_description = "Bronze Hoe",
-	description = toolranks.create_description("Bronze Hoe")})
+	minetest.override_item("farming:hoe_bronze", {
+		original_description = S("Bronze Hoe"),
+		description = toolranks.create_description(S("Bronze Hoe"))})
 
-minetest.override_item("farming:hoe_mese", {
-	original_description = "Mese Hoe",
-	description = toolranks.create_description("Mese Hoe")})
+	minetest.override_item("farming:hoe_mese", {
+		original_description = S("Mese Hoe"),
+		description = toolranks.create_description(S("Mese Hoe"))})
 
-minetest.override_item("farming:hoe_diamond", {
-	original_description = "Diamond Hoe",
-	description = toolranks.create_description("Diamond Hoe")})
+	minetest.override_item("farming:hoe_diamond", {
+		original_description = S("Diamond Hoe"),
+		description = toolranks.create_description(S("Diamond Hoe"))})
 end
 
 
@@ -314,13 +314,13 @@ local function throw_potion(itemstack, player)
 	local dir = player:get_look_dir()
 	local velocity = 20
 
-	obj:setvelocity({
+	obj:set_velocity({
 		x = dir.x * velocity,
 		y = dir.y * velocity,
 		z = dir.z * velocity
 	})
 
-	obj:setacceleration({
+	obj:set_acceleration({
 		x = dir.x * -3,
 		y = -9.5,
 		z = dir.z * -3
@@ -386,15 +386,9 @@ minetest.register_tool("farming:scythe_mithril", {
 
 		local def = minetest.registered_nodes[node.name]
 
-		if not def then
-			return
-		end
-
-		if not def.drop then
-			return
-		end
-
-		if not def.groups
+		if not def
+		or not def.drop
+		or not def.groups
 		or not def.groups.plant then
 			return
 		end
@@ -481,34 +475,4 @@ if minetest.get_modpath("moreores") then
 			{"", "", "group:stick"}
 		}
 	})
---[[
-	farming.register_hoe(":moreores:hoe_silver", {
-		description = S("%s Hoe"):format(S("Silver")),
-		inventory_image = "moreores_tool_silverhoe.png",
-		max_uses = 300,
-		material = "moreores:silver_ingot"
-	})
-
-	farming.register_hoe(":moreores:hoe_mithril", {
-		description = S("%s Hoe"):format(S("Mithril")),
-		inventory_image = "moreores_tool_mithrilhoe.png",
-		max_uses = 1000,
-		material = "moreores:mithril_ingot"
-	})
-
-	-- Toolranks support
-	if tr then
-
-		local desc = S("%s Hoe"):format(S("Silver"))
-
-		minetest.override_item("moreores:hoe_silver", {
-			original_description = desc,
-			description = toolranks.create_description(desc)})
-
-		desc = S("%s Hoe"):format(S("Mithril"))
-
-		minetest.override_item("moreores:hoe_mithril", {
-			original_description = desc,
-			description = toolranks.create_description(desc)})
-	end]]
 end

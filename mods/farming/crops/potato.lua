@@ -94,6 +94,7 @@ minetest.register_node("farming:potato_3", table.copy(def))
 -- stage 4
 def.tiles = {"farming_potato_4.png"}
 def.groups.growing = nil
+def.selection_box = farming.select_final
 def.drop = {
 	items = {
 		{items = {"farming:potato 2"}, rarity = 1},
@@ -110,3 +111,21 @@ farming.registered_plants["farming:potato"] = {
 	maxlight = farming.max_light,
 	steps = 4
 }
+
+-- mapgen
+minetest.register_decoration({
+	deco_type = "simple",
+	place_on = {"default:dirt_with_grass"},
+	sidelen = 16,
+	noise_params = {
+		offset = 0,
+		scale = farming.potato,
+		spread = {x = 100, y = 100, z = 100},
+		seed = 465,
+		octaves = 3,
+		persist = 0.6
+	},
+	y_min = 15,
+	y_max = 40,
+	decoration = "farming:potato_3"
+})
