@@ -49,6 +49,8 @@ Beds API
  * `beds.read_spawns() `   Returns a table containing players respawn positions
  * `beds.kick_players()`  Forces all players to leave bed
  * `beds.skip_night()`   Sets world time to morning and saves respawn position of all players currently sleeping
+ * `beds.day_interval`   Is a table with keys "start" and "finish". Allows you
+   to set the period of the day (timeofday format). Default: `{ start = 0.2, finish = 0.805 }`.
 
 ### Bed definition
 
@@ -440,11 +442,16 @@ Player API
 
 The player API can register player models and update the player's appearance.
 
+* `player_api.globalstep(dtime, ...)`
+	* The function called by the globalstep that controls player animations.
+	  You can override this to replace the globalstep with your own implementation.
+	* Receives all args that minetest.register_globalstep() passes
+
 * `player_api.register_model(name, def)`
 	* Register a new model to be used by players
 	* `name`: model filename such as "character.x", "foo.b3d", etc.
 	* `def`: see [#Model definition]
-    * Saved to player_api.registered_models
+	* Saved to player_api.registered_models
 
 * `player_api.registered_models[name]`
 	* Get a model's definition
@@ -1110,3 +1117,34 @@ This function registers a shapeless recipe that takes `ingredient`
 and `result` as input and outputs `result`.
 
 The metadata of the input `result` is copied to the output `result`.
+
+
+Log API
+-------
+
+Logs action of the player with a node at a certain position.
+By default only actions of real players are logged.
+Actions of non-players (usually machines) are logged only when
+setting `log_non_player_actions` is enabled.
+A player is considered non-player if `player:is_player()` returns
+`false` or `player.is_fake_player` is truthy. The use of
+`is_fake_player` is an unofficial standard between mods.
+These non-players are marked by the content of `is_fake_player`
+(if it is a string) or a "*" in brackets after the player name in
+the log.
+
+`default.log_player_action(player, ...)`
+
+ * `player`        The player who performed the action
+ * `message_parts` Any mumber of message parts describing the action
+                   in 3rd person singular present tense. It can also
+                   contain a `pos` which is logged as "(X,Y,Z)"
+
+`default.set_inventory_action_loggers(def, name)`
+
+ * hooks the callbacks `on_metadata_inventory_move`,
+   `on_metadata_inventory_put` and `on_metadata_inventory_take`
+   that log corresponding actions
+ * after logging the action, the original callback (if any) is called
+ * `def`     See [Node definition]
+ * `name`    Description of the node in the log message

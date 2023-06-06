@@ -67,7 +67,11 @@ function player_api.set_model(player, model_name)
 	if player_data.model == model_name then
 		return
 	end
+	-- Update data
 	player_data.model = model_name
+	-- Clear animation data as the model has changed
+	-- (required for setting the `stand` animation not to be a no-op)
+	player_data.animation, player_data.animation_speed = nil, nil
 
 	local model = models[model_name]
 	if model then
@@ -178,11 +182,11 @@ function minetest.calculate_knockback(player, ...)
 end
 
 -- Check each player and apply animations
-minetest.register_globalstep(function()
-	for _, player in pairs(minetest.get_connected_players()) do
+function player_api.globalstep()
+	for _, player in ipairs(minetest.get_connected_players()) do
 		local name = player:get_player_name()
 		local player_data = players[name]
-		local model = models[player_data.model]
+		local model = player_data and models[player_data.model]
 		if model and not player_attached[name] then
 			local controls = player:get_player_control()
 			local animation_speed_mod = model.animation_speed or 30
@@ -208,6 +212,11 @@ minetest.register_globalstep(function()
 			end
 		end
 	end
+end
+
+-- Mods can modify the globalstep by overriding player_api.globalstep
+minetest.register_globalstep(function(...)
+	player_api.globalstep(...)
 end)
 
 for _, api_function in pairs({"get_animation", "set_animation", "set_model", "set_textures"}) do

@@ -2057,10 +2057,9 @@ local function coral_on_place(itemstack, placer, pointed_thing)
 
 	if minetest.is_protected(pos_under, player_name) or
 			minetest.is_protected(pos_above, player_name) then
-		minetest.log("action", player_name
-			.. " tried to place " .. itemstack:get_name()
-			.. " at protected position "
-			.. minetest.pos_to_string(pos_under))
+		default.log_player_action(placer,
+			"tried to place", itemstack:get_name(),
+			"at protected position", pos_under)
 		minetest.record_protection_violation(pos_under, player_name)
 		return itemstack
 	end
@@ -2525,7 +2524,7 @@ local function update_bookshelf(pos)
 	end
 end
 
-minetest.register_node("default:bookshelf", {
+local default_bookshelf_def = {
 	description = S("Bookshelf"),
 	tiles = {"default_wood.png", "default_wood.png", "default_wood.png",
 		"default_wood.png", "default_bookshelf.png", "default_bookshelf.png"},
@@ -2550,19 +2549,10 @@ minetest.register_node("default:bookshelf", {
 		end
 		return 0
 	end,
-	on_metadata_inventory_move = function(pos, from_list, from_index, to_list, to_index, count, player)
-		minetest.log("action", player:get_player_name() ..
-			" moves stuff in bookshelf at " .. minetest.pos_to_string(pos))
+	on_metadata_inventory_put = function(pos)
 		update_bookshelf(pos)
 	end,
-	on_metadata_inventory_put = function(pos, listname, index, stack, player)
-		minetest.log("action", player:get_player_name() ..
-			" puts stuff to bookshelf at " .. minetest.pos_to_string(pos))
-		update_bookshelf(pos)
-	end,
-	on_metadata_inventory_take = function(pos, listname, index, stack, player)
-		minetest.log("action", player:get_player_name() ..
-			" takes stuff from bookshelf at " .. minetest.pos_to_string(pos))
+	on_metadata_inventory_take = function(pos)
 		update_bookshelf(pos)
 	end,
 	on_blast = function(pos)
@@ -2572,7 +2562,9 @@ minetest.register_node("default:bookshelf", {
 		minetest.remove_node(pos)
 		return drops
 	end,
-})
+}
+default.set_inventory_action_loggers(default_bookshelf_def, "bookshelf")
+minetest.register_node("default:bookshelf", default_bookshelf_def)
 
 local function register_sign(material, desc, def)
 	minetest.register_node("default:sign_wall_" .. material, {
@@ -2611,12 +2603,12 @@ local function register_sign(material, desc, def)
 			if not text then
 				return
 			end
-			if string.len(text) > 512 then
+			if #text > 512 then
 				minetest.chat_send_player(player_name, S("Text too long"))
 				return
 			end
-			minetest.log("action", player_name .. " wrote \"" .. text ..
-				"\" to the sign at " .. minetest.pos_to_string(pos))
+			text = text:gsub("[%z-\8\11-\31\127]", "") -- strip naughty control characters (keeps \t and \n)
+			default.log_player_action(sender, ("wrote %q to the sign at"):format(text), pos)
 			local meta = minetest.get_meta(pos)
 			meta:set_string("text", text)
 
@@ -2810,7 +2802,6 @@ minetest.register_node("default:glass", {
 	tiles = {"default_glass.png", "default_glass_detail.png"},
 	use_texture_alpha = "clip", -- only needed for stairs API
 	paramtype = "light",
-	paramtype2 = "glasslikeliquidlevel",
 	sunlight_propagates = true,
 	is_ground_content = false,
 	groups = {cracky = 3, oddly_breakable_by_hand = 3},
@@ -2823,7 +2814,6 @@ minetest.register_node("default:obsidian_glass", {
 	tiles = {"default_obsidian_glass.png", "default_obsidian_glass_detail.png"},
 	use_texture_alpha = "clip", -- only needed for stairs API
 	paramtype = "light",
-	paramtype2 = "glasslikeliquidlevel",
 	is_ground_content = false,
 	sunlight_propagates = true,
 	sounds = default.node_sound_glass_defaults(),
