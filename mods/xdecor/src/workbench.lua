@@ -35,10 +35,7 @@ workbench.defs = {
 	{"stair_inner",	1,  nil			  }
 }
 
-local repairable_tools = {"pick", "axe", "shovel"}
-
-if ar_api then  repairable_tools = {"pick", "axe", "shovel", "sword", "hoe", "armor", "shield"}
-else  repairable_tools = {"pick", "axe", "shovel", "hoe"} end
+local repairable_tools = xdecor.reparaible_tools
 
 local custom_repairable = {}
 function xdecor:register_repairable(item)

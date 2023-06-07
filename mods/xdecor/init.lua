@@ -27,11 +27,15 @@ else
 end
 
 xdecor.S = S
+xdecor.reparaible_tools = {"pick", "axe", "shovel", "sword"}
 
 dofile(modpath .. "/handlers/animations.lua")
 dofile(modpath .. "/handlers/helpers.lua")
 dofile(modpath .. "/handlers/nodeboxes.lua")
 dofile(modpath .. "/handlers/registration.lua")
+
+if ar_api then  xdecor.repairable_tools = {"pick", "axe", "shovel", "sword", "hoe", "armor", "shield"}
+else  xdecor.repairable_tools = {"pick", "axe", "shovel", "hoe"} end
 
 dofile(modpath .. "/src/nodes.lua")
 dofile(modpath .. "/src/recipes.lua")

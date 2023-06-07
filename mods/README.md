@@ -40,7 +40,7 @@ For information check [../README.md](../README.md)
 | weather            | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/eb64ff94f82d726e4a55b20fa7ce30e4a7470cc5 | |
 | wool               | https://codeberg.org/minenux/minetest-mod-wool      | https://codeberg.org/minenux/minetest-mod-wool/commit/de642a08e80bfd7a4a1e5629e50458a609dbda3a | [wool/README.md](wool/README.md) |
 | xpanes             | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/eb64ff94f82d726e4a55b20fa7ce30e4a7470cc5 | |
-| xdecor             | https://codeberg.org/minenux/minetest-game-xdecor   | https://codeberg.org/minenux/minetest-game-xdecor/commit/542d430537f3537b07bf5c919831160123498a2b | [xdecor/README.md](xdecor/README.md) |
+| xdecor             | https://codeberg.org/minenux/minetest-game-xdecor   | https://codeberg.org/minenux/minetest-game-xdecor/commit/f6d0f0b2a5c1d435217bb3409a76da9eb36fe889 | [xdecor/README.md](xdecor/README.md) |
 
 The default mod was splitted now sethome and player_api are mods, binoculars from v5 are 
 just separate privilegies for zoom, butterflies and fireflies from v5 can be set 
