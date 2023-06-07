@@ -92,10 +92,7 @@ end
 function enchanting.on_put(pos, listname, _, stack)
 	if listname == "tool" then
 		local stackname = stack:get_name()
-		local tool_groups = {
-			"axe, pick, shovel",
-			"sword",
-		}
+		local tool_groups = xdecor.reparaible_tools
 
 		for idx, tools in ipairs(tool_groups) do
 			if tools:find(stackname:match(":(%w+)")) then

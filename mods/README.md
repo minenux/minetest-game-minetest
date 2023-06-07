@@ -32,7 +32,7 @@ Most of those mods have mirror at http://git.mirror.org
 | walls              | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/c7cb79422ba19c696966472942db6177c934838d | |
 | wool               | https://codeberg.org/minenux/minetest-mod-wool      | https://codeberg.org/minenux/minetest-mod-wool/commit/de642a08e80bfd7a4a1e5629e50458a609dbda3a | [wool/README.md](wool/README.md) |
 | xpanes             | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/c7cb79422ba19c696966472942db6177c934838d | |
-| xdecor             | https://codeberg.org/minenux/minetest-game-xdecor   | https://codeberg.org/minenux/minetest-game-xdecor/commit/542d430537f3537b07bf5c919831160123498a2b | [xdecor/README.md](xdecor/README.md) |
+| xdecor             | https://codeberg.org/minenux/minetest-game-xdecor   | https://codeberg.org/minenux/minetest-game-xdecor/commit/f6d0f0b2a5c1d435217bb3409a76da9eb36fe889 | [xdecor/README.md](xdecor/README.md) |
 
 The default mod provides sethome and player_api call ones, binoculars from v5 are 
 just separate privilegies for zoom, butterflies and fireflies from v5 can be set 
