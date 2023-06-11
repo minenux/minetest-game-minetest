@@ -46,6 +46,18 @@ end
 function workbench:repairable(stack)
 	if custom_repairable[stack] then return true end
 
+	if ar_api then
+		for _, t in ipairs({
+			"armor_head",
+			"armor_torso",
+			"armor_legs",
+			"armor_feet",
+			"armor_shield",
+			}) do
+			if minetest.get_item_group(stack, t) then return true end
+		end
+	end
+
 	for _, t in ipairs(repairable_tools) do
 		if stack:find(t) then
 			return true
