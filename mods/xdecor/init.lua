@@ -2,6 +2,7 @@
 
 xdecor = {}
 local modpath = minetest.get_modpath("xdecor")
+local ar_api = minetest.get_modpath("3d_armor")
 
 -- Intllib
 local S
@@ -27,7 +28,7 @@ else
 end
 
 xdecor.S = S
-xdecor.reparaible_tools = {"pick", "axe", "shovel", "sword"}
+xdecor.reparaible_tools = {"pick", "axe", "shovel", "hoe"}
 
 dofile(modpath .. "/handlers/animations.lua")
 dofile(modpath .. "/handlers/helpers.lua")
