@@ -35,6 +35,7 @@ For information check [../README.md](../README.md)
 | stairs             | https://codeberg.org/minenux/minetest-mod-stairs    | https://codeberg.org/minenux/minetest-mod-stairs/commit/c3a5af6c452daca599d226df694df1b75f15c110 | [stairs/README.md](stairs/README.md) |
 | screwdriver        | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/eb64ff94f82d726e4a55b20fa7ce30e4a7470cc5 | |
 | tnt                | https://codeberg.org/minenux/minetest-mod-tnt       | https://codeberg.org/minenux/minetest-mod-tnt/commit/8195861f905a90b53cd52348deb34df41a053027 | [tnt/README.md](tnt/README.md) |
+| toolranks          | https://codeberg.org/minenux/minetest-mod-toolranks | https://codeberg.org/minenux/minetest-mod-toolranks/commit/5c9553e5ac6cc7ae375033b76ef7771a6935c771 | [toolranks/README.md](toolranks/README.md) |
 | vessels            | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/eb64ff94f82d726e4a55b20fa7ce30e4a7470cc5 | |
 | walls              | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/eb64ff94f82d726e4a55b20fa7ce30e4a7470cc5 | |
 | weather            | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/eb64ff94f82d726e4a55b20fa7ce30e4a7470cc5 | |
