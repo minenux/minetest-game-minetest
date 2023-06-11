@@ -1,0 +1,1 @@
+TOOL gains levels for digging nodes. Higher level take longer to wear out
