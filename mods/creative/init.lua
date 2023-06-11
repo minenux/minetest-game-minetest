@@ -4,13 +4,35 @@ minetest.register_privilege("creative", {
 	description = "Allow player to use creative inventory",
 	give_to_singleplayer = false,
 	give_to_admin = false
+	on_grant = update_sfinv,
+	on_revoke = update_sfinv,
 })
+
+local is_53 = minetest.has_feature("object_step_has_moveresult")
 
 local creative_mode_cache = minetest.settings:get_bool("creative_mode")
 
+-- backguard compatibility 
+function creative.is_creative(name)
+	if is_53 then
+		return minetest.is_creative_enabled(name)
+	else
+		return minetest.check_player_privs(name, {creative = true}) or creative_mode_cache
+	end
+end
+
+-- Override the engine's creative mode function
+local old_is_creative_enabled = creative.is_creative
+function minetest.is_creative_enabled(name)
+	if name == "" then
+		return old_is_creative_enabled(name)
+	end
+	return minetest.check_player_privs(name, {creative = true}) or old_is_creative_enabled(name)
+end
+
+-- For backwards compatibility:
 function creative.is_enabled_for(name)
-	return creative_mode_cache or
-		minetest.check_player_privs(name, {creative = true})
+	return creative.is_creative(name)
 end
 
 local player_inventory = {}
@@ -197,11 +219,11 @@ function creative.register_tab(name, title, items)
 	})
 end
 
---creative.register_tab("all", "All", minetest.registered_items)
---creative.register_tab("nodes", "Nodes", minetest.registered_nodes)
---creative.register_tab("tools", "Tools", minetest.registered_tools)
---creative.register_tab("craftitems", "Items", minetest.registered_craftitems)
-creative.register_tab("all", "Creative", minetest.registered_items)
+--creative.register_tab("all", "Creative", minetest.registered_items)
+creative.register_tab("all", "All", minetest.registered_items)
+creative.register_tab("nodes", "Nodes", minetest.registered_nodes)
+creative.register_tab("tools", "Tools", minetest.registered_tools)
+creative.register_tab("craftitems", "Items", minetest.registered_craftitems)
 
 local old_homepage_name = sfinv.get_homepage_name
 function sfinv.get_homepage_name(player)
