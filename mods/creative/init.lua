@@ -3,7 +3,7 @@ creative = {}
 minetest.register_privilege("creative", {
 	description = "Allow player to use creative inventory",
 	give_to_singleplayer = false,
-	give_to_admin = false
+	give_to_admin = false,
 	on_grant = update_sfinv,
 	on_revoke = update_sfinv,
 })
