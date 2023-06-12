@@ -18,7 +18,6 @@ For information check [../README.md](../README.md)
 | creative           | https://codeberg.org/minenux/minetest-mod-creative  | https://codeberg.org/minenux/minetest-mod-creative/commit/ca09e773701f834fec7de18bf13598b3323778db | [creative/README.md](creative/README.md) |
 | default            | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/eb64ff94f82d726e4a55b20fa7ce30e4a7470cc5 | |
 | player_api         | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/eb64ff94f82d726e4a55b20fa7ce30e4a7470cc5 | |
-| set_home           | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/eb64ff94f82d726e4a55b20fa7ce30e4a7470cc5 | |
 | env_sounds         | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/eb64ff94f82d726e4a55b20fa7ce30e4a7470cc5 | |
 | game_commands      | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/eb64ff94f82d726e4a55b20fa7ce30e4a7470cc5 | |
 | spawn              | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/eb64ff94f82d726e4a55b20fa7ce30e4a7470cc5 | |
@@ -34,6 +33,7 @@ For information check [../README.md](../README.md)
 | sfinv              | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/eb64ff94f82d726e4a55b20fa7ce30e4a7470cc5 | |
 | stairs             | https://codeberg.org/minenux/minetest-mod-stairs    | https://codeberg.org/minenux/minetest-mod-stairs/commit/c3a5af6c452daca599d226df694df1b75f15c110 | [stairs/README.md](stairs/README.md) |
 | screwdriver        | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/eb64ff94f82d726e4a55b20fa7ce30e4a7470cc5 | |
+| sethome            | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/8e59006dc81ebe6785380158e57ba126cb3a4163 | |
 | tnt                | https://codeberg.org/minenux/minetest-mod-tnt       | https://codeberg.org/minenux/minetest-mod-tnt/commit/8195861f905a90b53cd52348deb34df41a053027 | [tnt/README.md](tnt/README.md) |
 | toolranks          | https://codeberg.org/minenux/minetest-mod-toolranks | https://codeberg.org/minenux/minetest-mod-toolranks/commit/5c9553e5ac6cc7ae375033b76ef7771a6935c771 | [toolranks/README.md](toolranks/README.md) |
 | vessels            | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/eb64ff94f82d726e4a55b20fa7ce30e4a7470cc5 | |
