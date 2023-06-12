@@ -48,11 +48,11 @@ function workbench:repairable(stack)
 
 	if ar_api then
 		for _, t in ipairs({
-			"armor_head",
-			"armor_torso",
-			"armor_legs",
-			"armor_feet",
-			"armor_shield",
+				"armor_head",
+				"armor_torso",
+				"armor_legs",
+				"armor_feet",
+				"armor_shield",
 			}) do
 			if minetest.get_item_group(stack, t) then return true end
 		end
@@ -134,6 +134,9 @@ local formspecs = {
 }
 
 function workbench:set_formspec(meta, id)
+	if not formspecs[id] then
+		return
+	end
 	meta:set_string("formspec",
 		"size[8,7;]list[current_player;main;0,3.25;8,4;]" ..
 		formspecs[id] .. xbg .. default.get_hotbar_bg(0,3.25))
@@ -157,6 +160,16 @@ function workbench.fields(pos, _, fields)
 	if fields.quit then return end
 
 	local meta = minetest.get_meta(pos)
+	if fields.back and meta then
+		local inv = meta:get_inventory()
+		if inv:is_empty("input") then
+			inv:set_list("forms", {})
+		else
+			local input = inv:get_stack("input", 1)
+			workbench:get_output(inv, input, input:get_name())
+		end
+	end
+
 	local id = fields.back and 1 or fields.craft and 2 or fields.storage and 3
 	if not id then return end
 
@@ -174,6 +187,13 @@ function workbench.timer(pos)
 	local inv = minetest.get_meta(pos):get_inventory()
 	local tool = inv:get_stack("tool", 1)
 	local hammer = inv:get_stack("hammer", 1)
+
+	-- Mynetest: check that the item is a hammer. See https://github.com/Mynetest/Mynetest-server/issues/105
+	if hammer:get_name() ~= "xdecor:hammer" then
+		timer:stop()
+		inv:set_stack("hammer", 1, nil)
+		return
+	end
 
 	if tool:is_empty() or hammer:is_empty() or tool:get_wear() == 0 then
 		timer:stop()

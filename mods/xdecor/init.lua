@@ -7,24 +7,24 @@ local ar_api = minetest.get_modpath("3d_armor")
 -- Intllib
 local S
 if minetest.get_translator ~= nil then
-    S = minetest.get_translator("xdecor") -- 5.x translation function
+	S = minetest.get_translator("xdecor") -- 5.x translation function
 else
-    if minetest.get_modpath("intllib") then
-	dofile(minetest.get_modpath("intllib") .. "/init.lua")
-	if intllib.make_gettext_pair then
-	    gettext, ngettext = intllib.make_gettext_pair() -- new gettext method
-	else
-	    gettext = intllib.Getter() -- old text file method
+	if minetest.get_modpath("intllib") then
+		dofile(minetest.get_modpath("intllib") .. "/init.lua")
+		if intllib.make_gettext_pair then
+			gettext, ngettext = intllib.make_gettext_pair() -- new gettext method
+		else
+			gettext = intllib.Getter() -- old text file method
+		end
+		S = gettext
+	else -- boilerplate function
+		S = function(str, ...)
+			local args = {...}
+				return str:gsub("@%d+", function(match)
+					return args[tonumber(match:sub(2))]
+				end)
+		end
 	end
-	S = gettext
-    else -- boilerplate function
-	S = function(str, ...)
-	    local args = {...}
-	    return str:gsub("@%d+", function(match)
-		return args[tonumber(match:sub(2))]
-	    end)
-	end
-    end
 end
 
 xdecor.S = S
