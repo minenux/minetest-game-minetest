@@ -1,21 +1,80 @@
-creative = {}
 
-minetest.register_privilege("creative", {
-	description = "Allow player to use creative inventory",
-	give_to_singleplayer = false,
-	give_to_admin = false,
-	on_grant = update_sfinv,
-	on_revoke = update_sfinv,
-})
+-- Load support for MT game translation.
+local S
 
+if minetest.get_translator ~= nil then
+	S = minetest.get_translator("creative") -- 5.x translation function
+else
+	if minetest.get_modpath("intllib") then
+		dofile(minetest.get_modpath("intllib") .. "/init.lua")
+		if intllib.make_gettext_pair then
+			S = intllib.make_gettext_pair() -- new gettext method
+		else
+			S = intllib.Getter() -- old text file method
+		end
+	else -- boilerplate function
+		S = function(str, ...)
+			local args = {...}
+			return str:gsub("@%d+", function(match)
+				return args[tonumber(match:sub(2))]
+			end)
+		end
+	end
+end
+
+local is_50 = minetest.has_feature("object_use_texture_alpha")
 local is_53 = minetest.has_feature("object_step_has_moveresult")
+local is_54 = minetest.has_feature("direct_velocity_on_players")
+
+creative = {}
+creative.get_translator = S
+creative.is_50 = is_50
+creative.is_53 = is_53
+creative.is_54 = is_54
+
+local privs_description = "Allow player to use creative inventory"
+local privs_definition = {}
+
+local function update_sfinv(name)
+	minetest.after(0, function()
+		local player = minetest.get_player_by_name(name)
+		if player then
+			if sfinv.get_page(player):sub(1, 9) == "creative:" then
+				sfinv.set_page(player, sfinv.get_homepage_name(player))
+			else
+				sfinv.set_player_inventory_formspec(player)
+			end
+		end
+	end)
+end
+
+if is_50 then 
+	privs_definition = {
+		description = privs_description,
+		give_to_singleplayer = false,
+		give_to_admin = false,
+		on_grant = update_sfinv,
+		on_revoke = update_sfinv
+	}
+else
+	privs_definition = {
+		description = privs_description,
+		give_to_singleplayer = false
+	}
+end
+
+minetest.register_privilege("creative", privs_definition)
 
 local creative_mode_cache = minetest.settings:get_bool("creative_mode")
 
 -- backguard compatibility 
 function creative.is_creative(name)
-	if is_53 then
-		return minetest.is_creative_enabled(name)
+	if creative.is_53 then
+		if name == "" then
+			return minetest.is_creative_enabled(name)
+		else
+			return minetest.check_player_privs(name, {creative = true}) or creative_mode_cache
+		end
 	else
 		return minetest.check_player_privs(name, {creative = true}) or creative_mode_cache
 	end
@@ -57,7 +116,9 @@ function creative.init_creative_inventory(player)
 	player_inventory[player_name] = {
 		size = 0,
 		filter = "",
-		start_i = 0
+		start_i = 0,
+		old_filter = nil, -- use only for caching in update_creative_inventory
+		old_content = nil
 	}
 
 	minetest.create_detached_inventory("creative_" .. player_name, {
@@ -91,29 +152,76 @@ function creative.init_creative_inventory(player)
 	return player_inventory[player_name]
 end
 
+local NO_MATCH = 999
+local function match(s, filter)
+	if filter == "" then
+		return 0
+	end
+	if s:lower():find(filter, 1, true) then
+		return #s - #filter
+	end
+	return NO_MATCH
+end
+
+local function description(def, lang_code)
+	local s = def.description
+	if creative.is_53 then
+		if lang_code then
+			s = minetest.get_translated_string(lang_code, s)
+		end
+	end
+	return s:gsub("\n.*", "") -- First line only
+end
+
 function creative.update_creative_inventory(player_name, tab_content)
-	local creative_list = {}
 	local inv = player_inventory[player_name] or
 			creative.init_creative_inventory(minetest.get_player_by_name(player_name))
 	local player_inv = minetest.get_inventory({type = "detached", name = "creative_" .. player_name})
 
+	if inv.filter == inv.old_filter and tab_content == inv.old_content then
+		return
+	end
+	inv.old_filter = inv.filter
+	inv.old_content = tab_content
+
 	local items = inventory_cache[tab_content] or init_creative_cache(tab_content)
 
-	for name, def in pairs(items) do
-		if def.name:find(inv.filter, 1, true) or
-				def.description:lower():find(inv.filter, 1, true) then
-			creative_list[#creative_list+1] = name
+	local lang = minetest.settings:get("language") or "en"
+	local player_info = minetest.get_player_information(player_name)
+
+	if is_53 then 
+		if player_info and player_info.lang_code ~= "" then
+			lang = player_info.lang_code
 		end
 	end
 
-	table.sort(creative_list)
+	local creative_list = {}
+	local order = {}
+	for name, def in pairs(items) do
+		local m = match(description(def), inv.filter)
+		if m > 0 then
+			m = math.min(m, match(description(def, lang), inv.filter))
+		end
+		if m > 0 then
+			m = math.min(m, match(name, inv.filter))
+		end
+
+		if m < NO_MATCH then
+			creative_list[#creative_list+1] = name
+			-- Sort by match value first so closer matches appear earlier
+			order[name] = string.format("%02d", m) .. name
+		end
+	end
+
+	table.sort(creative_list, function(a, b) return order[a] < order[b] end)
+
 	player_inv:set_size("main", #creative_list)
 	player_inv:set_list("main", creative_list)
 	inv.size = #creative_list
 end
 
 -- Create the trash field
-local trash = minetest.create_detached_inventory("creative_trash", {
+local trash = minetest.create_detached_inventory("trash", {
 	-- Allow the stack to be placed and remove it in on_put()
 	-- This allows the creative inventory to restore the stack
 	allow_put = function(inv, listname, index, stack, player)
@@ -138,35 +246,33 @@ function creative.register_tab(name, title, items)
 			creative.update_creative_inventory(player_name, items)
 			local inv = player_inventory[player_name]
 			local start_i = inv.start_i or 0
-			local pagenum = math.floor(start_i / (3*8) + 1)
-			local pagemax = math.ceil(inv.size / (3*8))
+			local pagenum = math.floor(inv.start_i / (4*8) + 1)
+			local pagemax = math.max(math.ceil(inv.size / (4*8)), 1)
+			local esc = minetest.formspec_escape
 			return sfinv.make_formspec(player, context,
-				"label[6.2,3.35;" .. minetest.colorize("#FFFF00", tostring(pagenum)) .. " / " .. tostring(pagemax) .. "]" ..
+				(inv.size == 0 and ("label[3,2;>_<]") or "") ..
+				"label[5.8,4.15;" .. minetest.colorize("#FFFF00", tostring(pagenum)) .. " / " .. tostring(pagemax) .. "]" ..
 				[[
-					image[4.06,3.4;0.8,0.8;creative_trash_icon.png]
+					image[4,3.9;0.8,0.8;creative_trash_icon.png]
 					listcolors[#00000069;#5A5A5A;#141318;#30434C;#FFF]
 					list[current_player;main;0,4.7;8,1;]
 					list[current_player;main;0,5.85;8,3;8]
-					list[detached:creative_trash;main;4,3.3;1,1;]
+					list[detached:trash;main;4,3.9;1,1;]
 					listring[]
-					button[5.4,3.2;0.8,0.9;creative_prev;<]
-					button[7.25,3.2;0.8,0.9;creative_next;>]
-					button[2.1,3.4;0.8,0.5;creative_search;?]
-					button[2.75,3.4;0.8,0.5;creative_clear;X]
---					image_button[5.4,3.25;0.8,0.8;creative_prev_icon.png;creative_prev;]
---					image_button[7.2,3.25;0.8,0.8;creative_next_icon.png;creative_next;]
---					image_button[2.1,3.25;0.8,0.8;creative_search_icon.png;creative_search;]
---					image_button[2.75,3.25;0.8,0.8;creative_clear_icon.png;creative_clear;]
-					tooltip[creative_search;Search]
-					tooltip[creative_clear;Reset]
-					tooltip[creative_prev;Previous page]
-					tooltip[creative_next;Next page]
-					listring[current_player;main]
-					field_close_on_enter[creative_filter;false]
+					button[5,4.05;0.8,0.8;creative_prev;<]
+					button[7.25,4.05;0.8,0.8;creative_next;>]
+					button[2.63,4.05;0.8,0.8;creative_search;?]
+					button[3.25,4.05;0.8,0.8;creative_clear;X]
 				]] ..
-				"field[0.3,3.5;2.2,1;creative_filter;;" .. minetest.formspec_escape(inv.filter) .. "]" ..
+				"tooltip[creative_search;" .. esc(S("Search")) .. "]" ..
+				"tooltip[creative_clear;" .. esc(S("Reset")) .. "]" ..
+				"tooltip[creative_prev;" .. esc(S("Previous page")) .. "]" ..
+				"tooltip[creative_next;" .. esc(S("Next page")) .. "]" ..
+				"listring[current_player;main]" ..
+				"field_close_on_enter[creative_filter;false]" ..
+				"field[0.3,4.2;2.8,1.2;creative_filter;;" .. esc(inv.filter) .. "]" ..
 				"listring[detached:creative_" .. player_name .. ";main]" ..
-				"list[detached:creative_" .. player_name .. ";main;0,0;8,3;" .. tostring(start_i) .. "]" ..
+				"list[detached:creative_" .. player_name .. ";main;0,0;8,4;" .. tostring(inv.start_i) .. "]" ..
 				default.get_hotbar_bg(0,4.7) ..
 				default.gui_bg .. default.gui_bg_img .. default.gui_slots
 				.. creative.formspec_add, false)
@@ -186,27 +292,30 @@ function creative.register_tab(name, title, items)
 			if fields.creative_clear then
 				inv.start_i = 0
 				inv.filter = ""
-				creative.update_creative_inventory(player_name, items)
+				--creative.update_creative_inventory(player_name, items)
 				sfinv.set_player_inventory_formspec(player, context)
-			elseif fields.creative_search or
-					fields.key_enter_field == "creative_filter" then
+			elseif (fields.creative_search or
+					fields.key_enter_field == "creative_filter")
+					and fields.creative_filter then
 				inv.start_i = 0
-				inv.filter = fields.creative_filter:lower()
-				creative.update_creative_inventory(player_name, items)
+				inv.filter = fields.creative_filter:sub(1, 128) -- truncate to a sane length
+						:gsub("[%z\1-\8\11-\31\127]", "") -- strip naughty control characters (keeps \t and \n)
+						:lower() -- search is case insensitive
+				--creative.update_creative_inventory(player_name, items)
 				sfinv.set_player_inventory_formspec(player, context)
 			elseif not fields.quit then
 				local start_i = inv.start_i or 0
 
 				if fields.creative_prev then
-					start_i = start_i - 3*8
+					start_i = start_i - 4*8
 					if start_i < 0 then
-						start_i = inv.size - (inv.size % (3*8))
+						start_i = inv.size - (inv.size % (4*8))
 						if inv.size == start_i then
-							start_i = math.max(0, inv.size - (3*8))
+							start_i = math.max(0, inv.size - (4*8))
 						end
 					end
 				elseif fields.creative_next then
-					start_i = start_i + 3*8
+					start_i = start_i + 4*8
 					if start_i >= inv.size then
 						start_i = 0
 					end
@@ -219,11 +328,36 @@ function creative.register_tab(name, title, items)
 	})
 end
 
---creative.register_tab("all", "Creative", minetest.registered_items)
-creative.register_tab("all", "All", minetest.registered_items)
-creative.register_tab("nodes", "Nodes", minetest.registered_nodes)
-creative.register_tab("tools", "Tools", minetest.registered_tools)
-creative.register_tab("craftitems", "Items", minetest.registered_craftitems)
+-- Sort registered items
+local registered_nodes = {}
+local registered_tools = {}
+local registered_craftitems = {}
+
+local tab_items = function()
+	for name, def in pairs(minetest.registered_items) do
+		local group = def.groups or {}
+
+		local nogroup = not (group.node or group.tool or group.craftitem)
+		if group.node or (nogroup and minetest.registered_nodes[name]) then
+			registered_nodes[name] = def
+		elseif group.tool or (nogroup and minetest.registered_tools[name]) then
+			registered_tools[name] = def
+		elseif group.craftitem or (nogroup and minetest.registered_craftitems[name]) then
+			registered_craftitems[name] = def
+		end
+	end
+end
+
+if minetest.register_on_mods_loaded then
+	minetest.register_on_mods_loaded(tab_items)
+else
+	minetest.after(0.1, tab_items)
+end
+
+creative.register_tab("all", S("All"), minetest.registered_items)
+creative.register_tab("nodes", S("Nodes"), minetest.registered_nodes)
+creative.register_tab("tools", S("Tools"), minetest.registered_tools)
+creative.register_tab("craftitems", S("Items"), minetest.registered_craftitems)
 
 local old_homepage_name = sfinv.get_homepage_name
 function sfinv.get_homepage_name(player)
@@ -235,13 +369,14 @@ function sfinv.get_homepage_name(player)
 end
 
 
-if creative_mode_cache then
-	-- Dig time is modified according to difference (leveldiff) between tool
-	-- 'maxlevel' and node 'level'. Digtime is divided by the larger of
-	-- leveldiff and 1.
-	-- To speed up digging in creative, hand 'maxlevel' and 'digtime' have been
-	-- increased such that nodes of differing levels have an insignificant
-	-- effect on digtime.
+if minetest.is_creative_enabled("") then
+	local hand_hack = function()
+		-- Dig time is modified according to difference (leveldiff) between tool
+		-- 'maxlevel' and node 'level'. Digtime is divided by the larger of
+		-- leveldiff and 1.
+		-- To speed up digging in creative, hand 'maxlevel' and 'digtime' have been
+		-- increased such that nodes of differing levels have an insignificant
+		-- effect on digtime.
 	local digtime = 42
 	local caps = {times = {digtime, digtime, digtime}, uses = 0, maxlevel = 256}
 
@@ -259,33 +394,50 @@ if creative_mode_cache then
 				snappy  = caps,
 				choppy  = caps,
 				oddly_breakable_by_hand = caps,
+					-- dig_immediate group doesn't use value 1. Value 3 is instant dig
+				dig_immediate = {times = {[2] = digtime, [3] = 0}, uses = 0, maxlevel = 256},
 			},
 			damage_groups = {fleshy = 10},
 		}
 	})
+	end
+	if minetest.register_on_mods_loaded then
+		minetest.register_on_mods_loaded(hand_hack)
+	else
+		minetest.after(0.2, hand_hack)
+	end
 end
 
 -- Unlimited node placement
 minetest.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack)
-	if placer and placer:is_player() then
-		return creative.is_enabled_for(placer:get_player_name())
+	if placer then
+		if placer:is_player() then
+			return creative.is_creative(placer:get_player_name())
+		end
 	end
 end)
 
--- Don't pick up if the item is already in the inventory
-local old_handle_node_drops = minetest.handle_node_drops
-function minetest.handle_node_drops(pos, drops, digger)
-	if not digger or not digger:is_player() or
---		not creative.is_enabled_for(digger:get_player_name()) then
-		not creative_mode_cache then
-		return old_handle_node_drops(pos, drops, digger)
-	end
-	local inv = digger:get_inventory()
-	if inv then
-		for _, item in ipairs(drops) do
-			if not inv:contains_item("main", item, true) then
-				inv:add_item("main", item)
+-- Don't pick up if the item is already in the inventory only in hard creative single
+if creative_mode_cache then
+	local old_handle_node_drops = minetest.handle_node_drops
+	function minetest.handle_node_drops(pos, drops, digger)
+		if not digger then
+			if not digger:is_player() then
+				if not creative.is_creative(digger:get_player_name()) then
+					return old_handle_node_drops(pos, drops, digger)
+				end
+			end
+		end
+		local inv = digger:get_inventory()
+		if inv then
+			for _, item in ipairs(drops) do
+				if not inv:contains_item("main", item, true) then
+					inv:add_item("main", item)
+				end
 			end
 		end
 	end
 end
+
+print("[creative] mod loaded")
+
