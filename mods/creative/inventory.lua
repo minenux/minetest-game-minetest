@@ -1,6 +1,6 @@
 -- creative/inventory.lua
 
--- support for MT game translation.
+-- Load support for MT game translation.
 local S = creative.get_translator
 
 local player_inventory = {}
@@ -33,7 +33,7 @@ function creative.init_creative_inventory(player)
 	minetest.create_detached_inventory("creative_" .. player_name, {
 		allow_move = function(inv, from_list, from_index, to_list, to_index, count, player2)
 			local name = player2 and player2:get_player_name() or ""
-			if not minetest.is_creative_enabled(name) or
+			if not creative.is_enabled_for(name) or
 					to_list == "main" then
 				return 0
 			end
@@ -44,7 +44,7 @@ function creative.init_creative_inventory(player)
 		end,
 		allow_take = function(inv, listname, index, stack, player2)
 			local name = player2 and player2:get_player_name() or ""
-			if not minetest.is_creative_enabled(name) then
+			if not creative.is_enabled_for(name) then
 				return 0
 			end
 			return -1
@@ -74,8 +74,10 @@ end
 
 local function description(def, lang_code)
 	local s = def.description
-	if lang_code then
-		s = minetest.get_translated_string(lang_code, s)
+	if creative.is_53 then
+		if lang_code then
+			s = minetest.get_translated_string(lang_code, s)
+		end
 	end
 	return s:gsub("\n.*", "") -- First line only
 end
@@ -93,10 +95,13 @@ function creative.update_creative_inventory(player_name, tab_content)
 
 	local items = inventory_cache[tab_content] or init_creative_cache(tab_content)
 
-	local lang
+	local lang = minetest.settings:get("language") or "en"
 	local player_info = minetest.get_player_information(player_name)
-	if player_info and player_info.lang_code ~= "" then
-		lang = player_info.lang_code
+
+	if is_53 then 
+		if player_info and player_info.lang_code ~= "" then
+			lang = player_info.lang_code
+		end
 	end
 
 	local creative_list = {}
@@ -143,12 +148,13 @@ function creative.register_tab(name, title, items)
 	sfinv.register_page("creative:" .. name, {
 		title = title,
 		is_in_nav = function(self, player, context)
-			return minetest.is_creative_enabled(player:get_player_name())
+			return creative.is_enabled_for(player:get_player_name())
 		end,
 		get = function(self, player, context)
 			local player_name = player:get_player_name()
 			creative.update_creative_inventory(player_name, items)
 			local inv = player_inventory[player_name]
+			local start_i = inv.start_i or 0
 			local pagenum = math.floor(inv.start_i / (4*8) + 1)
 			local pagemax = math.max(math.ceil(inv.size / (4*8)), 1)
 			local esc = minetest.formspec_escape
@@ -156,14 +162,14 @@ function creative.register_tab(name, title, items)
 				(inv.size == 0 and ("label[3,2;"..esc(S("No items to show.")).."]") or "") ..
 				"label[5.8,4.15;" .. minetest.colorize("#FFFF00", tostring(pagenum)) .. " / " .. tostring(pagemax) .. "]" ..
 				[[
-					image[4.08,4.2;0.8,0.8;creative_trash_icon.png]
+					image[4,4;0.8,0.8;creative_trash_icon.png]
 					listcolors[#00000069;#5A5A5A;#141318;#30434C;#FFF]
-					list[detached:trash;main;4.02,4.1;1,1;]
+					list[detached:trash;main;4,4;1,1;]
 					listring[]
-					image_button[5,4.05;0.8,0.8;creative_prev_icon.png;creative_prev;]
-					image_button[7.25,4.05;0.8,0.8;creative_next_icon.png;creative_next;]
-					image_button[2.63,4.05;0.8,0.8;creative_search_icon.png;creative_search;]
-					image_button[3.25,4.05;0.8,0.8;creative_clear_icon.png;creative_clear;]
+					button[5,4.05;0.8,0.8;creative_prev;<]
+					button[7.25,4.05;0.8,0.8;creative_next;>]
+					button[2.63,4.05;0.8,0.8;creative_search;?]
+					button[3.25,4.05;0.8,0.8;creative_clear;X]
 				]] ..
 				"tooltip[creative_search;" .. esc(S("Search")) .. "]" ..
 				"tooltip[creative_clear;" .. esc(S("Reset")) .. "]" ..
@@ -248,18 +254,17 @@ end
 if minetest.register_on_mods_loaded then
 	minetest.register_on_mods_loaded(tab_items)
 else
-	minetest.after(0, tab_items)
+	minetest.after(0.1, tab_items)
 end
 
---creative.register_tab("all", S("Creative"), minetest.registered_items)
-creative.register_tab("all", S("All"), minetest.registered_items)
-creative.register_tab("nodes", S("Nodes"), registered_nodes)
-creative.register_tab("tools", S("Tools"), registered_tools)
-creative.register_tab("craftitems", S("Items"), registered_craftitems)
+creative.register_tab("all", S("Creative"), minetest.registered_items)
+--creative.register_tab("nodes", S("Nodes"), minetest.registered_nodes)
+--creative.register_tab("tools", S("Tools"), minetest.registered_tools)
+--creative.register_tab("craftitems", S("Items"), minetest.registered_craftitems)
 
 local old_homepage_name = sfinv.get_homepage_name
 function sfinv.get_homepage_name(player)
-	if minetest.is_creative_enabled(player:get_player_name()) then
+	if creative.is_enabled_for(player:get_player_name()) then
 		return "creative:all"
 	else
 		return old_homepage_name(player)

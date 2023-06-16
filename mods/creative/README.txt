@@ -1,13 +1,14 @@
 Minetest Game mod: creative
 ===========================
 
-Simplified creative with faster loading
+Simplified creative for more accurate on mobile or small screens
 
 Information
 ------------
 
 This mod is named `creative` and is a replacement for default "creative" mod 
-of orginal game, with reduced tabs, also it uses a cached memory to faster lodaing.
+of orginal game, with reduced tabs, also minenux fork it uses a cached memory 
+to faster lodaing respect settings.
 
 ![screenshot.png](screenshot.png)
 
@@ -19,8 +20,10 @@ for backguard compatibility with 5.2 and 0.4.16, with minimal backports, you
 can download from https://codeberg.org/minenux/minetest-mod-creative and after 
 clone or downloaded renamed to `creative` (obviously replace the current one if any)
 
-Modified by TenPlus1 (added creative privelage, reduced tab count, tweaked code), 
+Modified by TenPlus1 (added creative privilege, reduced tab count, tweaked code), 
 original work is at https://notabug.org/TenPlus1/creative
+
+The minenux fork cut down images to use only text so media download is not a hit!
 
 ### Authors of source code
 
@@ -29,7 +32,7 @@ Jean-Patrick G. (kilbith) <jeanpatrick.guerrero@gmail.com> (MIT)
 
 ### Author of media (textures)
 
-Jean-Patrick G. (kilbith) <jeanpatrick.guerrero@gmail.com> (CC BY-SA 3.0)
+Jean-Patrick G. (kilbith) <jeanpatrick.guerrero@gmail.com> (CC-BY-SA 3.0)
 
 LICENSE
 -------
