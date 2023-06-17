@@ -1,4 +1,7 @@
 
+-- support to more biomes if ethereal is detected
+local m_eth = minetest.get_modpath("ethereal")
+
 -- firefly 
 minetest.register_node("fireflies:firefly", {
 	description = "Firefly",
@@ -150,6 +153,26 @@ minetest.register_decoration({
 	decoration = "fireflies:firefly",
 })
 
+if m_eth then
+	local biomes_allowed = {
+		"deciduous_forest",
+		"coniferous_forest",
+		"rainforest",
+		"rainforest_swamp",
+		"grassland",
+		"junglee",
+		"junglee_ocean",
+		"bamboo",
+		"mountain"
+	}
+else
+	local biomes_Allowed = {
+		"deciduous_forest",
+		"coniferous_forest",
+		"rainforest",
+		"rainforest_swamp"
+	}
+
 minetest.register_decoration({
 	deco_type = "simple",
 	place_on = {
@@ -161,12 +184,7 @@ minetest.register_decoration({
 	place_offset_y = 3,
 	sidelen = 80,
 	fill_ratio = 0.002,
-	biomes = {
-		"deciduous_forest",
-		"coniferous_forest",
-		"rainforest",
-		"rainforest_swamp"
-	},
+	biomes = biomes_allowed,
 	y_min = -1,
 	y_max = 31000,
 	decoration = "fireflies:firefly",
