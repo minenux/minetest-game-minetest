@@ -26,7 +26,7 @@ For information check [../README.md](../README.md)
 | dye                | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/eb64ff94f82d726e4a55b20fa7ce30e4a7470cc5 | |
 | farming            | https://codeberg.org/minenux/minetest-mod-farming   | https://codeberg.org/minenux/minetest-mod-farming/commit/08c3a9b37bab5d8a0f5971b168aef412db5fc424 | [farming/README.md](farming/README.md) |
 | fire               | https://codeberg.org/minenux/minetest-mod-fire      | https://codeberg.org/minenux/minetest-mod-fire/commit/4e5f7ad55314bd9b126fb133cfc5a32fa58b20d2 | [fire/README.md](fire/README.md) |
-| fireflies          | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/eb64ff94f82d726e4a55b20fa7ce30e4a7470cc5 | |
+| fireflies          | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/fc4ab2538d432a20978ee3bbd1b69a42446e9132 | [fireflies/README.md](fireflies/README.md) |
 | flowers            | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/eb64ff94f82d726e4a55b20fa7ce30e4a7470cc5 | |
 | give_initial_stuff | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/ee86fb1c41e7d8d2a1d94764dd64808bc8ff5999 | [give_initial_stuff/README.md](give_initial_stuff/README.md) |
 | killme             | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/eb64ff94f82d726e4a55b20fa7ce30e4a7470cc5 | |
