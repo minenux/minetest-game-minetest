@@ -2,8 +2,12 @@
 
 -- Load support for MT game translation.
 local S = minetest.get_translator("fireflies")
+-- support to more biomes if ethereal is detected
+local m_eth = minetest.get_modpath("ethereal")
+-- detecting cretive engine over creative privilegies
+local m_cre = minetest.get_modpath("creative")
 
-
+-- firefly 
 minetest.register_node("fireflies:firefly", {
 	description = S("Firefly"),
 	drawtype = "plantlike",
@@ -106,9 +110,11 @@ minetest.register_tool("fireflies:bug_net", {
 				minetest.add_item(pointed_thing.under, node_name.." 1")
 			end
 		end
-		if not (creative and creative.is_enabled_for(player:get_player_name())) then
-			itemstack:add_wear(256)
-			return itemstack
+		if not m_cre then
+			if creative.is_enabled_for(player:get_player_name())) then
+				itemstack:add_wear(256)
+				return itemstack
+			end
 		end
 	end
 })
@@ -142,7 +148,7 @@ minetest.register_node("fireflies:firefly_bottle", {
 	sunlight_propagates = true,
 	light_source = 9,
 	walkable = false,
-	groups = {vessel = 1, dig_immediate = 3, attached_node = 1},
+	groups = {vessel = 1, dig_immediate = 3, snappy = 3, attached_node = 1},
 	selection_box = {
 		type = "fixed",
 		fixed = {-0.25, -0.5, -0.25, 0.25, 0.3, 0.25}
@@ -181,6 +187,44 @@ minetest.register_craft( {
 	}
 })
 
+local biomes_allowed = {}
+local places_allowed = {}
+
+if m_eth then
+	biomes_allowed = {
+		"deciduous_forest",
+		"coniferous_forest",
+		"rainforest",
+		"rainforest_swamp",
+		"grassland",
+		"junglee",
+		"junglee_ocean",
+		"bamboo"
+	}
+	places_allowed = {
+		"default:dirt_with_grass",
+		"default:dirt_with_coniferous_litter",
+		"default:dirt_with_rainforest_litter",
+		"default:dirt",
+		"default:dirt_with_grass",
+		"ethereal:junglee_dirt",
+		"default:sand",
+		"ethereal:bamboo_dirt"
+	}
+else
+	biomes_allowed = {
+		"deciduous_forest",
+		"coniferous_forest",
+		"rainforest",
+		"rainforest_swamp"
+	}
+	places_allowed = {
+		"default:dirt_with_grass",
+		"default:dirt_with_coniferous_litter",
+		"default:dirt_with_rainforest_litter",
+		"default:dirt"
+	}
+end
 
 -- register fireflies as decorations
 
@@ -215,21 +259,11 @@ else
 	minetest.register_decoration({
 		name = "fireflies:firefly_low",
 		deco_type = "simple",
-		place_on = {
-			"default:dirt_with_grass",
-			"default:dirt_with_coniferous_litter",
-			"default:dirt_with_rainforest_litter",
-			"default:dirt"
-		},
+		place_on = places_allowed,
 		place_offset_y = 2,
 		sidelen = 80,
 		fill_ratio = 0.0005,
-		biomes = {
-			"deciduous_forest",
-			"coniferous_forest",
-			"rainforest",
-			"rainforest_swamp"
-		},
+		biomes = biomes_allowed,
 		y_max = 31000,
 		y_min = -1,
 		decoration = "fireflies:hidden_firefly",
@@ -238,21 +272,11 @@ else
 	minetest.register_decoration({
 		name = "fireflies:firefly_high",
 		deco_type = "simple",
-		place_on = {
-			"default:dirt_with_grass",
-			"default:dirt_with_coniferous_litter",
-			"default:dirt_with_rainforest_litter",
-			"default:dirt"
-		},
+		place_on = places_allowed,
 		place_offset_y = 3,
 		sidelen = 80,
 		fill_ratio = 0.0005,
-		biomes = {
-			"deciduous_forest",
-			"coniferous_forest",
-			"rainforest",
-			"rainforest_swamp"
-		},
+		biomes = biomes_allowed,
 		y_max = 31000,
 		y_min = -1,
 		decoration = "fireflies:hidden_firefly",
