@@ -21,7 +21,7 @@ Most of those mods have mirror at http://git.mirror.org
 | dye                | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/c7cb79422ba19c696966472942db6177c934838d | |
 | farming            | https://codeberg.org/minenux/minetest-mod-farming   | https://codeberg.org/minenux/minetest-mod-farming/commit/08c3a9b37bab5d8a0f5971b168aef412db5fc424 | [farming/README.md](farming/README.md) |
 | fire               | https://codeberg.org/minenux/minetest-mod-fire      | https://codeberg.org/minenux/minetest-mod-fire/commit/4e5f7ad55314bd9b126fb133cfc5a32fa58b20d2 | [fire/README.md](fire/README.md) |
-| fireflies          | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/b5434409b6dda7a810f5ddc9a630970216204cbe | [fireflies/README.md](fireflies/README.md) |
+| fireflies          | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/ee13c9f46ad23972dfd52e74104b265d81bd50b8 | [fireflies/README.md](fireflies/README.md) |
 | flowers            | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/c7cb79422ba19c696966472942db6177c934838d | |
 | give_initial_stuff | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/c7cb79422ba19c696966472942db6177c934838d | |
 | killme             | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/c7cb79422ba19c696966472942db6177c934838d | |
