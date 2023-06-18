@@ -25,8 +25,8 @@ if home and not sfinvhome then
 	local get_formspec = function(name)
 
 		local formspec = "size[6,2]"
-			.. "button_exit[2,2.5;4,1;home_gui_go;" .. "-> Home" .. "]"
-			.. "button_exit[2,4.5;4,1;home_gui_set;" .. "!! Home <-" .. "]"
+			.. "button_exit[2,2.5;4,1;home_gui_go;" .. "---> Home ?" .. "]"
+			.. "button_exit[2,4.5;4,1;home_gui_set;" .. "-> -|Home|- <-" .. "]"
 		--	.. "button_exit[2,6.5;4,1;home_gui_spawn;" .. S("Spawn") .. "]"
 
 		local home = sethome.get(name)
