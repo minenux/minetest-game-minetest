@@ -58,7 +58,7 @@ minetest.register_tool("fireflies:bug_net", {
 			end
 		end
 		if not m_cre then
-			if creative.is_enabled_for(player:get_player_name())) then
+			if creative.is_enabled_for(player:get_player_name()) then
 				itemstack:add_wear(256)
 				return itemstack
 			end
