@@ -23,6 +23,7 @@ Most of those mods have mirror at http://git.mirror.org
 | fire               | https://codeberg.org/minenux/minetest-mod-fire      | https://codeberg.org/minenux/minetest-mod-fire/commit/4e5f7ad55314bd9b126fb133cfc5a32fa58b20d2 | [fire/README.md](fire/README.md) |
 | fireflies          | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/ee13c9f46ad23972dfd52e74104b265d81bd50b8 | [fireflies/README.md](fireflies/README.md) |
 | flowers            | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/c7cb79422ba19c696966472942db6177c934838d | |
+| hudbars            | https://codeberg.org/minenux/minetest-mod-hudbars   | https://codeberg.org/minenux/minetest-mod-hudbars/commit/facc2cffb88f1a14ec36becf19f673506c5689aa | [hudbars/README.md](hudbars/README.md) |
 | give_initial_stuff | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/c7cb79422ba19c696966472942db6177c934838d | |
 | killme             | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/c7cb79422ba19c696966472942db6177c934838d | |
 | sfinv              | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/c7cb79422ba19c696966472942db6177c934838d | |
