@@ -68,27 +68,23 @@ minetest.register_privilege("creative", privs_definition)
 
 local creative_mode_cache = minetest.settings:get_bool("creative_mode")
 
--- backguard compatibility 
-function creative.is_creative(name)
-	if creative.is_53 then
-		if name == "" then
-			return minetest.is_creative_enabled(name)
-		else
-			return minetest.check_player_privs(name, {creative = true}) or creative_mode_cache
-		end
+function minetest.is_creative_enabled(name)
+	if name == "" then
+		return creative_mode_cache
 	else
 		return minetest.check_player_privs(name, {creative = true}) or creative_mode_cache
 	end
 end
 
--- Override the engine's creative mode function
-local old_is_creative_enabled = creative.is_creative
-function minetest.is_creative_enabled(name)
+-- backguard compatibility 
+function creative.is_creative(name)
 	if name == "" then
-		return old_is_creative_enabled(name)
+		return creative_mode_cache
+	else
+		return minetest.check_player_privs(name, {creative = true}) or creative_mode_cache
 	end
-	return minetest.check_player_privs(name, {creative = true}) or old_is_creative_enabled(name)
 end
+
 
 -- For backwards compatibility:
 function creative.is_enabled_for(name)
