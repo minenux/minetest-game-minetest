@@ -46,3 +46,7 @@ else
 	hb.settings.sorting = { ["health"] = 0, ["breath"] = 1 }
 	hb.settings.sorting_reverse = { [0] = "health", [1] = "breath" }
 end
+
+hb.settings.hp_player_maximun = hb.load_setting("hudbars_hp_player_maximun", "number", 20)
+hb.settings.br_player_maximun = hb.load_setting("hudbars_br_player_maximun", "number", 10)
+
