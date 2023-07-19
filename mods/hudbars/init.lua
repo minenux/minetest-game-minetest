@@ -74,6 +74,19 @@ local function player_exists(player)
 	return player ~= nil and player:is_player()
 end
 
+local function checksupportmax(player)
+	local statusinfo = minetest.get_server_status()
+	if string.find(statusinfo,"0.4.1") and not string.find(statusinfo,"0.4.18") and not string.find(statusinfo,"0.4.17.5") then
+		hb.settings.hp_player_maximun = 20
+		hb.settings.br_player_maximun = 10
+		if player_exists(player) then
+			player:set_properties({hp_max = 20})
+		else
+			minetest.log("error","[hudbars] WARNING! minetest version do not support customization of hp_max healt player values")
+		end
+	end
+end
+
 local function make_label(format_string, format_string_config, label, start_value, max_value)
 	local params = {}
 	local order = format_string_config.order
@@ -143,6 +156,7 @@ function hb.get_hudbar_position_index(identifier)
 end
 
 function hb.register_hudbar(identifier, text_color, label, textures, default_start_value, default_start_max, default_start_hidden, format_string, format_string_config)
+	checksupportmax()
 	minetest.log("action", "hb.register_hudbar: "..tostring(identifier))
 	local hudtable = {}
 	local pos, offset
@@ -331,6 +345,7 @@ function hb.register_hudbar(identifier, text_color, label, textures, default_sta
 end
 
 function hb.init_hudbar(player, identifier, start_value, start_max, start_hidden)
+	checksupportmax(player)
 	if not player_exists(player) then return false end
 	local hudtable = hb.get_hudtable(identifier)
 	hb.hudtables[identifier].add_all(player, hudtable, start_value, start_max, start_hidden)

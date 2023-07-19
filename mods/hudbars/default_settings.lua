@@ -50,3 +50,8 @@ end
 hb.settings.hp_player_maximun = hb.load_setting("hudbars_hp_player_maximun", "number", 20)
 hb.settings.br_player_maximun = hb.load_setting("hudbars_br_player_maximun", "number", 10)
 
+if minetest.has_feature("object_use_texture_alpha") then
+core.PLAYER_MAX_HP_DEFAULT = hb.settings.hp_player_maximun
+else
+core.PLAYER_MAX_HP = hb.settings.hp_player_maximun
+end
