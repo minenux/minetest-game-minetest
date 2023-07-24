@@ -1,6 +1,10 @@
 # textdomain: hudbars
 Health=
 Breath=
+Armor=
 
-# Default format string for progress bar-style HUD bars, e.g. “Health 5/20”
+# Default format string for progress bar-style HUD bars, e.g. “Health 05/20”
 @1: @2/@3=
+
+# Format string for displaying the armor. E.g. "Armor: 100%"
+@1: @2%=
