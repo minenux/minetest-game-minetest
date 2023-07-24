@@ -28,7 +28,7 @@ For information check [../README.md](../README.md)
 | fire               | https://codeberg.org/minenux/minetest-mod-fire      | https://codeberg.org/minenux/minetest-mod-fire/commit/4e5f7ad55314bd9b126fb133cfc5a32fa58b20d2 | [fire/README.md](fire/README.md) |
 | fireflies          | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/fc4ab2538d432a20978ee3bbd1b69a42446e9132 | [fireflies/README.md](fireflies/README.md) |
 | flowers            | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/eb64ff94f82d726e4a55b20fa7ce30e4a7470cc5 | |
-| hudbars            | https://codeberg.org/minenux/minetest-mod-hudbars   | https://codeberg.org/minenux/minetest-mod-hudbars/commit/c219b708f89ccf8683c3ee33e1fe55641cc8b10a | [hudbars/README.md](hudbars/README.md) |
+| hudbars            | https://codeberg.org/minenux/minetest-mod-hudbars   | https://codeberg.org/minenux/minetest-mod-hudbars/commit/e3db263828cb96f06d848e6dc80d90f21c7f92a0 | [hudbars/README.md](hudbars/README.md) |
 | give_initial_stuff | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/ee86fb1c41e7d8d2a1d94764dd64808bc8ff5999 | [give_initial_stuff/README.md](give_initial_stuff/README.md) |
 | killme             | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/eb64ff94f82d726e4a55b20fa7ce30e4a7470cc5 | |
 | sfinv              | https://codeberg.org/minenux/minetest-game-minetest | https://codeberg.org/minenux/minetest-game-minetest/commit/eb64ff94f82d726e4a55b20fa7ce30e4a7470cc5 | |

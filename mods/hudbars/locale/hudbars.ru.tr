@@ -1,4 +1,7 @@
 # textdomain: hudbars
-Health=HP
+Health=Здоровье
 Breath=дыхание
 @1: @2/@3=@1: @2/@3
+Armor=Доспехи
+@1: @2%=@1: @2%
+Satiation=голод

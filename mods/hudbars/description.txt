@@ -1,1 +1,1 @@
-HUD mod to display as bars and API for
+HUD mod to display as bars and API for satiaton/stamina and armor status features

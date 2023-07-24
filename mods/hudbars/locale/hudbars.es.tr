@@ -2,3 +2,10 @@
 Health=Salud
 Breath=Aliento
 @1: @2/@3=@1: @2/@3
+Armor=Armado
+@1: @2%=@1:@2%
+Satiation=Saciado
+Set satiation of player or yourself=Establece la saciedad en el jugador o en si mismo
+Not possible, damage is disabled.=No es posible, daño esta desactivado.
+Invalid satiation!=Satisfaccion invalida!
+Player @1 does not exist.=El jugador @1 no existe.

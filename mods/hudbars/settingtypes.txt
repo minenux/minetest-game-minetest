@@ -19,7 +19,7 @@ hudbars_bar_type (HUD bars style) enum progress_bar progress_bar,statbar_classic
 
 # If enabled (default), the breath indicators in the HUD will be automatically hidden shortly
 # after the breath has been filled up. Otherwise, the breath will always be displayed. 
-hudbars_autohide_breath (Automatically hide breath indicators) bool true
+hudbars_autohide_breath (Automatically hide breath indicators) bool false
 
 # This setting changes the way the HUD bars are ordered on the display. You can choose
 # between a zig-zag pattern (default) or a vertically stacked pattern.
@@ -120,8 +120,21 @@ hudbars_tick (Default HUD bars update interval) float 0.3 0.0 4.0
 
 [player values defaults]
 # set a default value for max hp healt of player, if you customized and need on older engines
-hudbars_hp_player_maximun (maximun value of heal of player) int 20
+hudbars_hp_player_maximun (maximun value of heal of player) int 40
 # set a default value for max breath of player, if you customized and need on older engines
-hudbars_br_player_maximun (maximun value of braeth of player) int 10
+hudbars_br_player_maximun (maximun value of braeth of player) int 20
 
+#If true, automatically hides the armor HUD bar when the player wears no
+#armor. Otherwise, the armor bar shows “0%”.
+hbarmor_autohide (Automatically hide armor HUD bar) bool false
+
+hbhunger_satiation_tick (Time in seconds after which 1 saturation point is taken) float 800
+
+hbhunger_satiation_sprint_dig (exhaustion increased this value after digged node) float 3
+
+hbhunger_satiation_sprint_place (exhaustion increased this value after placed) float 1
+
+hbhunger_satiation_sprint_move (exhaustion increased this value if player movement detected) float 0.3
+
+hbhunger_satiation_sprint_lvl (at what exhaustion player satiation gets lowerd) float 160
 
