@@ -103,6 +103,19 @@ end
 -- Load default settings
 dofile(minetest.get_modpath("hudbars").."/default_settings.lua")
 
+local serverinfo = minetest.get_version()
+local statusinfo = serverinfo.string
+
+if string.find(statusinfo,"0.4.1") and not string.find(statusinfo,"0.4.18") and not string.find(statusinfo,"0.4.17.3") then
+	hb.settings.hp_player_maximun = 20
+	hb.settings.br_player_maximun = 10
+	minetest.log("error","[hudbars] minetest version do not support customization of hp_max healt player values")
+	minetest.PLAYER_MAX_HP = hb.settings.hp_player_maximun
+else
+	minetest.PLAYER_MAX_HP_DEFAULT = hb.settings.hp_player_maximun
+end
+-- all settings configured
+
 if not modhbhung then
 
 	-- due lackof global hbhunger these need to be first
@@ -146,25 +159,13 @@ local must_hide = function(playername, arm)
 	if modarmors then
 		return ((not armor.def[playername].count or armor.def[playername].count == 0 or not hb.settings.forceload_default_hudbars) and arm == 0)
 	end
-	return modarmors
+	return (modarmors and hbarmor.autohide)
 end
 
 local arm_printable = function(arm)
 	return math.ceil(math.floor(arm+0.5))
 end
 
-local function checksupportmax(player)
-	local statusinfo = minetest.get_server_status()
-	if string.find(statusinfo,"0.4.1") and not string.find(statusinfo,"0.4.18") and not string.find(statusinfo,"0.4.17.3") then
-		hb.settings.hp_player_maximun = 20
-		hb.settings.br_player_maximun = 10
-		if player_exists(player) then
-			player:set_properties({hp_max = 20})
-		else
-			minetest.log("error","[hudbars] WARNING! minetest version do not support customization of hp_max healt player values")
-		end
-	end
-end
 
 local function make_label(format_string, format_string_config, label, start_value, max_value)
 	local params = {}
@@ -232,7 +233,6 @@ function hb.get_hudbar_position_index(identifier)
 end
 
 function hb.register_hudbar(identifier, text_color, label, textures, default_start_value, default_start_max, default_start_hidden, format_string, format_string_config)
-	checksupportmax()
 	minetest.log("action", "hb.register_hudbar: "..tostring(identifier))
 	local hudtable = {}
 	local pos, offset
@@ -421,7 +421,6 @@ function hb.register_hudbar(identifier, text_color, label, textures, default_sta
 end
 
 function hb.init_hudbar(player, identifier, start_value, start_max, start_hidden)
-	checksupportmax(player)
 	if not player_exists(player) then return false end
 	local hudtable = hb.get_hudtable(identifier)
 	hb.hudtables[identifier].add_all(player, hudtable, start_value, start_max, start_hidden)
@@ -799,13 +798,15 @@ minetest.register_on_leaveplayer(function(player)
 	end
 end)
 
-local modresult = ""
+if modhbarm then
+	minetest.log("warning","[hudbars] not using build-in hbarmor")
+end
 
-if modhbarm then modresult = modresult .. " without build-in hbarmor" end
-if modhbhung then modresult = modresult .. " without build-in hbhunger" end
+if modhbhung then
+	minetest.log("warning","[hudbars] not using build-in hbarmor")
+end
 
-minetest.log("[MOD] hudbars"..modresult.." loaded" )
-
+minetest.log("[MOD] hudbars loaded" )
 
 local main_timer = 0
 local timer = 0
