@@ -4,6 +4,18 @@
 -- Player animation blending
 -- Note: This is currently broken due to a bug in Irrlicht, leave at 0
 local animation_blend = 0
+local modelchar
+local eyeheithg
+
+local is_50 = minetest.has_feature("object_use_texture_alpha") or nil
+
+if is_50 then
+	modelchar = "character50.b3d"
+	eyeheithg = 1.47
+else
+	modelchar = "character40.b3d"
+	eyeheithg = 1.625
+end
 
 default.registered_player_models = { }
 
@@ -15,7 +27,7 @@ function default.player_register_model(name, def)
 end
 
 -- Default player appearance
-default.player_register_model("character.b3d", {
+default.player_register_model( modelchar, {
 	animation_speed = 30,
 	textures = {"character.png", },
 	animations = {
@@ -27,7 +39,9 @@ default.player_register_model("character.b3d", {
 		walk_mine = { x=200, y=219, },
 		sit       = { x= 81, y=160, },
 	},
-	eye_height = 1.625,
+	collisionbox = {-0.3, 0.0, -0.3, 0.3, 1.7, 0.3},
+	stepheight = 0.6,
+	eye_height = eyeheithg,
 })
 
 -- Player stats and animations
@@ -59,14 +73,19 @@ function default.player_set_model(player, model_name)
 			textures = player_textures[name] or model.textures,
 			visual = "mesh",
 			visual_size = model.visual_size or {x=1, y=1},
-			eye_height = model.eye_height or 1.47,
+			collisionbox = model.collisionbox or {-0.3, 0.0, -0.3, 0.3, 1.7, 0.3},
+			stepheight = model.stepheight or 0.6,
+			eye_height = model.eye_height or eyeheithg,
 		})
 		default.player_set_animation(player, "stand")
 	else
 		player:set_properties({
 			textures = { "player.png", "player_back.png", },
 			visual = "upright_sprite",
-			eye_height = 1.625,
+			visual_size = {x=1, y=2},
+			collisionbox = {-0.3, 0.0, -0.3, 0.3, 1.75, 0.3},
+			stepheight = 0.6,
+			eye_height = eyeheithg,
 		})
 	end
 	player_model[name] = model_name
@@ -74,8 +93,11 @@ end
 
 function default.player_set_textures(player, textures)
 	local name = player:get_player_name()
-	player_textures[name] = textures
-	player:set_properties({textures = textures,})
+	local model = models[player_model[name]]
+	local model_textures = model and model.textures or nil
+	player_textures[name] = textures or model_textures
+	player:set_properties({textures = textures or model_textures,})
+	player:set_properties({hp_max = hp_player_maximun})
 end
 
 function default.player_set_animation(player, anim_name, speed)
@@ -95,7 +117,7 @@ end
 -- Update appearance when the player joins
 minetest.register_on_joinplayer(function(player)
 	default.player_attached[player:get_player_name()] = false
-	default.player_set_model(player, "character.b3d")
+	default.player_set_model(player, modelchar)
 	player:set_local_animation({x=0, y=79}, {x=168, y=187}, {x=189, y=198}, {x=200, y=219}, 30)
 
 	player:hud_set_hotbar_image("gui_hotbar.png")
