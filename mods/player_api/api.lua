@@ -6,6 +6,18 @@ player_api = {}
 -- Player animation blending
 -- Note: This is currently broken due to a bug in Irrlicht, leave at 0
 local animation_blend = 0
+local player_api.modelchar
+local player_api.eyeheithg
+
+local is_50 = minetest.has_feature("object_use_texture_alpha") or nil
+
+if is_50 then
+	player_api.modelchar = "character50.b3d"
+	player_api.eyeheithg = 1.47
+else
+	player_api.modelchar = "character40.b3d"
+	player_api.eyeheithg = 1.625
+end
 
 player_api.registered_models = { }
 
@@ -47,7 +59,7 @@ function player_api.set_model(player, model_name)
 			visual_size = model.visual_size or {x = 1, y = 1},
 			collisionbox = model.collisionbox or {-0.3, 0.0, -0.3, 0.3, 1.7, 0.3},
 			stepheight = model.stepheight or 0.6,
-			eye_height = model.eye_height or 1.47,
+			eye_height = model.eye_height or player_api.eyeheithg,
 		})
 		player_api.set_animation(player, "stand")
 	else
@@ -57,7 +69,7 @@ function player_api.set_model(player, model_name)
 			visual_size = {x = 1, y = 2},
 			collisionbox = {-0.3, 0.0, -0.3, 0.3, 1.75, 0.3},
 			stepheight = 0.6,
-			eye_height = 1.625,
+			eye_height = player_api.eyeheithg,
 		})
 	end
 	player_model[name] = model_name
