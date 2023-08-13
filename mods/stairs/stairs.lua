@@ -273,7 +273,7 @@ stairs.register_all("snowblock", "default:snowblock",
 	{crumbly = 3, cools_lava = 1, snowy = 1},
 	{"default_snow.png"},
 	"Snow Block",
-	default.node_sound_snow_defaults(), true)
+	stairs.node_sound_snow_defaults(), true)
 
 stairs.register_all("ice", "default:ice",
 	{cracky = 3, cools_lava = 1},

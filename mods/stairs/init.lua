@@ -11,20 +11,6 @@ function default.node_sound_wool_defaults(table)
 	return table
 end
 
--- add new 5.x snow sounds to 0.4.x client
-if not minetest.has_feature("object_use_texture_alpha") then
-
-	function default.node_sound_snow_defaults(table)
-
-		table = table or {}
-
-		table.footstep = table.footstep or {name = "default_snow_footstep", gain = 0.1}
-		table.dug = table.dug or {name = "default_snow_footstep", gain = 0.3}
-		table.place = table.place or {name = "default_place_node", gain = 1.0}
-
-		return table
-	end
-end
 
 stairs = {
 	mod = "redo",
@@ -36,6 +22,20 @@ stairs = {
 	metal = default.node_sound_metal_defaults(),
 	wool = default.node_sound_wool_defaults()
 }
+
+-- add new 5.x snow sounds to 0.4.x client
+--if not minetest.has_feature("object_use_texture_alpha") then
+	function stairs.node_sound_snow_defaults(table)
+
+		table = table or {}
+
+		table.footstep = table.footstep or {name = "default_snow_footstep", gain = 0.1}
+		table.dug = table.dug or {name = "default_snow_footstep", gain = 0.3}
+		table.place = table.place or {name = "default_place_node", gain = 1.0}
+
+		return table
+	end
+--end
 
 
 -- cache creative
