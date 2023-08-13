@@ -2,6 +2,8 @@
 
 dofile(minetest.get_modpath("player_api") .. "/api.lua")
 
+player_api.dynamicmodel(nil)
+
 -- Default player appearance
 player_api.register_model(player_api.modelchar, {
 	animation_speed = 30,
@@ -22,7 +24,9 @@ player_api.register_model(player_api.modelchar, {
 
 -- Update appearance when the player joins
 minetest.register_on_joinplayer(function(player)
-	player_api.player_attached[player:get_player_name()] = false
+	local player_name = player:get_player_name()
+	player_api.dynamicmodel(player_name)
+	player_api.player_attached[player_name] = false
 	player_api.set_model(player, player_api.modelchar)
 	player:set_local_animation(
 		{x = 0,   y = 79},

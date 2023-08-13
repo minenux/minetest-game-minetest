@@ -6,17 +6,63 @@ player_api = {}
 -- Player animation blending
 -- Note: This is currently broken due to a bug in Irrlicht, leave at 0
 local animation_blend = 0
-local player_api.modelchar
-local player_api.eyeheithg
+
+player_api.modelchar = "character.b3d"
+player_api.eyeheithg = 1.5
+player_api.collsibox = {-0.3, 0.0, -0.3, 0.3, 1.7, 0.3}
 
 local is_50 = minetest.has_feature("object_use_texture_alpha") or nil
 
-if is_50 then
-	player_api.modelchar = "character50.b3d"
-	player_api.eyeheithg = 1.47
-else
-	player_api.modelchar = "character40.b3d"
-	player_api.eyeheithg = 1.625
+function  player_api.dynamicmodel(player_name)
+
+	if not player_name then
+		if is_50 then
+			player_api.modelchar = "character50.b3d"
+			player_api.eyeheithg = 1.625
+		else
+			player_api.modelchar = "character40.b3d"
+			player_api.eyeheithg = 1.47
+		end
+		return
+	end
+
+	local engineold = is_50
+	local info = minetest.get_player_information(player_name)
+	-- ugly hack due mixed protocols:
+	if info then
+		local test = info.version_string or "5.0"
+		if test:find("0.4.") or test:find("4.0.")  or test:find("4.1.") then
+			engineold = true
+			player_api.modelchar = "character40.b3d"
+			player_api.eyeheithg = 1.47
+			player_api.collsibox = {-0.3, 0.0, -0.3, 0.3, 1.7, 0.3}
+		else
+			engineold = false
+			player_api.modelchar = "character50.b3d"
+			player_api.eyeheithg = 1.625
+			player_api.collsibox = {-0.3, 0.0, -0.3, 0.3, 1.7, 0.3}
+		end
+		-- only refix register model when protocols are mixed, will slow down server
+		if engineold == true and is_50 == true then
+			minetest.log("warning", "[default/player_api] performance impact: mixed protocols DETECTED on player .. "..player_name.." doin re-register model hack")
+			player_api.register_model( player_api.modelchar, {
+				animation_speed = 30,
+				textures = {"character.png", },
+				animations = {
+					-- Standard animations.
+					stand     = {x = 0,   y = 79},
+					lay       = {x = 162, y = 166},
+					walk      = {x = 168, y = 187},
+					mine      = {x = 189, y = 198},
+					walk_mine = {x = 200, y = 219},
+					sit       = {x = 81,  y = 160},
+				},
+				collisionbox = player_api.collsibox,
+				stepheight = 0.6,
+				eye_height = eyeheithg,
+			})
+		end
+	end
 end
 
 player_api.registered_models = { }
@@ -67,7 +113,7 @@ function player_api.set_model(player, model_name)
 			textures = {"player.png", "player_back.png"},
 			visual = "upright_sprite",
 			visual_size = {x = 1, y = 2},
-			collisionbox = {-0.3, 0.0, -0.3, 0.3, 1.75, 0.3},
+			collisionbox = player_api.collsibox,
 			stepheight = 0.6,
 			eye_height = player_api.eyeheithg,
 		})
