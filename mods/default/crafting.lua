@@ -35,7 +35,7 @@ minetest.register_craft({
 	}
 })
 
-minetest.register_craft({
+-minetest.register_craft({
 	output = 'default:wood',
 	recipe = {
 		{'default:bush_stem'},
@@ -1151,4 +1151,15 @@ minetest.register_craft({
 	type = "fuel",
 	recipe = "default:sword_wood",
 	burntime = 5,
+})
+
+
+minetest.register_craft({
+	type = "shaped",
+	output = "default:sunglasses",
+	recipe = {
+		{"default:sunglass", "default:stick", "default:sunglass"},
+		{"default:sunglass", "default:stick", "default:sunglass"},
+		{"default:sunglass", "default:stick", "default:sunglass"}
+	}
 })
