@@ -516,3 +516,17 @@ minetest.register_craft({
 	recipe = "default:sword_wood",
 	burntime = 5,
 })
+
+minetest.register_tool("default:sunglasses", {
+	description = "Sunglasses",
+	inventory_image = "sunglasses.png",
+	groups = {armor_head=15, armor_heal=0, armor_use=100},
+	wear = 0,
+})
+
+minetest.register_tool("default:sunglass", {
+	description = "Glass head",
+	inventory_image = "armoraddons_glass.png",
+	groups = {armor_head=15, armor_heal=0, armor_use=100},
+	wear = 0,
+})

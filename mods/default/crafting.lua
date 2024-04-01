@@ -744,3 +744,13 @@ minetest.register_craft({
 	recipe = "default:dry_shrub",
 	burntime = 2,
 })
+
+minetest.register_craft({
+	type = "shaped",
+	output = "default:sunglasses",
+	recipe = {
+		{"default:sunglass", "default:stick", "default:sunglass"},
+		{"default:sunglass", "default:stick", "default:sunglass"},
+		{"default:sunglass", "default:stick", "default:sunglass"}
+	}
+})
