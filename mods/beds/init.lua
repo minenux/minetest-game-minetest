@@ -41,6 +41,11 @@ beds.is_50 = is_50
 beds.is_53 = is_53
 beds.is_54 = is_54
 
+beds.day_interval = {
+	start = 0.2,
+	finish = 0.805,
+}
+
 local modpath = minetest.get_modpath("beds")
 
 -- check for minetest 5.x/0.4 compatibility
