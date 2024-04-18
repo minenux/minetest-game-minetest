@@ -6,6 +6,8 @@ local S = minetest.get_translator("fireflies")
 local m_eth = minetest.get_modpath("ethereal")
 -- detecting cretive engine over creative privilegies
 local m_cre = minetest.get_modpath("creative")
+-- Legacy compatibility, when pointabilities don't exist, pointable is set to true.
+local pointable_compat = not minetest.features.item_specific_pointabilities
 
 -- firefly 
 minetest.register_node("fireflies:firefly", {
@@ -27,6 +29,7 @@ minetest.register_node("fireflies:firefly", {
 	sunlight_propagates = true,
 	buildable_to = true,
 	walkable = false,
+	pointable = pointable_compat,
 	groups = {catchable = 1},
 	selection_box = {
 		type = "fixed",
@@ -95,6 +98,7 @@ minetest.register_node("fireflies:hidden_firefly", {
 minetest.register_tool("fireflies:bug_net", {
 	description = S("Bug Net"),
 	inventory_image = "fireflies_bugnet.png",
+	pointabilities = {nodes = {["group:catchable"] = true}},
 	on_use = function(itemstack, player, pointed_thing)
 		if not pointed_thing or pointed_thing.type ~= "node" or
 				minetest.is_protected(pointed_thing.under, player:get_player_name()) then
