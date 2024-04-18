@@ -1977,6 +1977,7 @@ minetest.register_node("default:sand_with_kelp", {
 	}),
 
 	on_place = function(itemstack, placer, pointed_thing)
+		if not placer and not placer:is_player() then return itemstack end
 		-- Call on_rightclick if the pointed node defines it
 		if pointed_thing.type == "node" and placer and
 				not placer:get_player_control().sneak then
@@ -1997,7 +1998,7 @@ minetest.register_node("default:sand_with_kelp", {
 		local pos_top = {x = pos.x, y = pos.y + height, z = pos.z}
 		local node_top = minetest.get_node(pos_top)
 		local def_top = minetest.registered_nodes[node_top.name]
-		local player_name = placer:get_player_name()
+		local player_name = placer and placer:get_player_name() or ""
 
 		if def_top and def_top.liquidtype == "source" and
 				minetest.get_item_group(node_top.name, "water") > 0 then
@@ -2029,11 +2030,11 @@ minetest.register_node("default:sand_with_kelp", {
 --
 
 local function coral_on_place(itemstack, placer, pointed_thing)
-	if pointed_thing.type ~= "node" or not placer then
+	if pointed_thing.type ~= "node" or not placer or not placer:is_player() then
 		return itemstack
 	end
 
-	local player_name = placer:get_player_name()
+	local player_name = placer and placer:get_player_name() or ""
 	local pos_under = pointed_thing.under
 	local pos_above = pointed_thing.above
 	local node_under = minetest.get_node(pos_under)
@@ -2542,16 +2543,19 @@ minetest.register_node("default:bookshelf", {
 		return 0
 	end,
 	on_metadata_inventory_move = function(pos, from_list, from_index, to_list, to_index, count, player)
+		if not player or not player:is_player() then return end
 		minetest.log("action", player:get_player_name() ..
 			" moves stuff in bookshelf at " .. minetest.pos_to_string(pos))
 		update_bookshelf(pos)
 	end,
 	on_metadata_inventory_put = function(pos, listname, index, stack, player)
+		if not player or not player:is_player() then return end
 		minetest.log("action", player:get_player_name() ..
 			" puts stuff to bookshelf at " .. minetest.pos_to_string(pos))
 		update_bookshelf(pos)
 	end,
 	on_metadata_inventory_take = function(pos, listname, index, stack, player)
+		if not player or not player:is_player() then return end
 		minetest.log("action", player:get_player_name() ..
 			" takes stuff from bookshelf at " .. minetest.pos_to_string(pos))
 		update_bookshelf(pos)
@@ -2594,7 +2598,8 @@ local function register_sign(material, desc, def)
 		end,
 		on_receive_fields = function(pos, formname, fields, sender)
 			--print("Sign at "..minetest.pos_to_string(pos).." got "..dump(fields))
-			local player_name = sender:get_player_name()
+			if not sender or not sender:is_player() then return end
+			local player_name = sender:get_player_name() or ""
 			if minetest.is_protected(pos, player_name) then
 				minetest.record_protection_violation(pos, player_name)
 				return

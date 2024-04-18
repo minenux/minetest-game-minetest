@@ -33,7 +33,7 @@ function cart_entity:on_rightclick(clicker)
 	if not clicker or not clicker:is_player() then
 		return
 	end
-	local player_name = clicker:get_player_name()
+	local player_name = clicker and clicker:get_player_name() or ""
 	if self.driver and player_name == self.driver then
 		carts:manage_attachment(clicker, nil)
 	elseif not self.driver then
@@ -67,7 +67,8 @@ end
 
 -- 0.5.x and later: When the driver leaves
 function cart_entity:on_detach_child(child)
-	if child and child:get_player_name() == self.driver then
+	if not child or not child:is_player() then return end
+	if child:get_player_name() == self.driver then
 		-- Clean up eye height
 		carts:manage_attachment(child, nil)
 		self.driver = nil
@@ -449,8 +450,9 @@ minetest.register_craftitem("carts:cart", {
 		minetest.sound_play({name = "default_place_node_metal", gain = 0.5},
 			{pos = pointed_thing.above}, true)
 
+		local player_name = placer and placer:get_player_name() or ""
 		if not (creative and creative.is_enabled_for
-				and creative.is_enabled_for(placer:get_player_name())) then
+				and creative.is_enabled_for(player_name)) then
 			itemstack:take_item()
 		end
 		return itemstack

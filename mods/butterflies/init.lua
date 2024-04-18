@@ -40,7 +40,8 @@ for i in ipairs (butter_list) do
 		},
 		floodable = true,
 		on_place = function(itemstack, placer, pointed_thing)
-			local player_name = placer:get_player_name()
+			if not placer or not placer:is_player() then return itemstack end
+			local player_name = placer and placer:get_player_name() or ""
 			local pos = pointed_thing.above
 
 			if not minetest.is_protected(pos, player_name) and
@@ -73,7 +74,8 @@ for i in ipairs (butter_list) do
 		groups = {not_in_creative_inventory = 1},
 		floodable = true,
 		on_place = function(itemstack, placer, pointed_thing)
-			local player_name = placer:get_player_name()
+			if not placer or not placer:is_player() then return itemstack end
+			local player_name = placer and placer:get_player_name() or ""
 			local pos = pointed_thing.above
 
 			if not minetest.is_protected(pos, player_name) and
