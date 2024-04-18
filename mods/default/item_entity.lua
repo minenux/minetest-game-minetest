@@ -52,7 +52,7 @@ local item = {
 				if pos == nil then
 					return -- object already deleted
 				end
-				local node = minetest.get_node_or_nil(self.object:get_pos())
+				local node = minetest.get_node_or_nil(pos)
 				if not node then
 					return
 				end
