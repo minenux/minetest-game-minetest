@@ -38,6 +38,7 @@ minetest.register_node("fireflies:firefly", {
 	light_source = 6,
 	floodable = true,
 	on_place = function(itemstack, placer, pointed_thing)
+		if not player and not player:is_player() then return itemstack end
 		local player_name = placer:get_player_name()
 		local pos = pointed_thing.above
 
@@ -104,6 +105,7 @@ minetest.register_tool("fireflies:bug_net", {
 				minetest.is_protected(pointed_thing.under, player:get_player_name()) then
 			return
 		end
+		if not player and not player:is_player() then return end
 		local node_name = minetest.get_node(pointed_thing.under).name
 		local inv = player:get_inventory()
 		if minetest.get_item_group(node_name, "catchable") == 1 then
@@ -159,6 +161,7 @@ minetest.register_node("fireflies:firefly_bottle", {
 	},
 	sounds = default.node_sound_glass_defaults(),
 	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
+		if not player and not player:is_player() then return end
 		local lower_pos = {x = pos.x, y = pos.y + 1, z = pos.z}
 		if minetest.is_protected(pos, player:get_player_name()) or
 				minetest.get_node(lower_pos).name ~= "air" then
