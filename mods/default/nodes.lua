@@ -1832,6 +1832,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 end)
 
 minetest.register_on_leaveplayer(function(player)
+	if not player then return end
 	local pn = player:get_player_name()
 	if open_chests[pn] then
 		chest_lid_close(pn)
@@ -1857,40 +1858,40 @@ function default.register_chest(name, d)
 		end
 		def.after_place_node = function(pos, placer)
 			local meta = minetest.get_meta(pos)
-			meta:set_string("owner", placer:get_player_name() or "")
+			meta:set_string("owner", placer and placer:get_player_name() or "")
 			meta:set_string("infotext", "Locked Chest (owned by " ..
 					meta:get_string("owner") .. ")")
 		end
 		def.can_dig = function(pos,player)
 			local meta = minetest.get_meta(pos);
 			local inv = meta:get_inventory()
-			return inv:is_empty("main") and
-					default.can_interact_with_node(player, pos)
+			if inv then return inv:is_empty("main") and default.can_interact_with_node(player, pos) end
+			return
 		end
 		def.allow_metadata_inventory_move = function(pos, from_list, from_index,
 				to_list, to_index, count, player)
-			if not default.can_interact_with_node(player, pos) then
-				return 0
+			if player then
+				if not default.can_interact_with_node(player, pos) then return 0 end
 			end
 			return count
 		end
 		def.allow_metadata_inventory_put = function(pos, listname, index, stack, player)
-			if not default.can_interact_with_node(player, pos) then
-				return 0
+			if player then
+				if not default.can_interact_with_node(player, pos) then return 0 end
 			end
 			return stack:get_count()
 		end
 		def.allow_metadata_inventory_take = function(pos, listname, index, stack, player)
-			if not default.can_interact_with_node(player, pos) then
-				return 0
+			if player then
+				if not default.can_interact_with_node(player, pos) then return 0 end
 			end
 			return stack:get_count()
 		end
 		def.on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
-			if not default.can_interact_with_node(clicker, pos) then
-				return itemstack
+			if clicker then
+				if not default.can_interact_with_node(clicker, pos) then return itemstack end
 			end
-
+			if not clicker return end
 			minetest.sound_play(def.sound_open, {gain = 0.3,
 					pos = pos, max_hear_distance = 10})
 			if not chest_lid_obstructed(pos) then
@@ -1907,6 +1908,7 @@ function default.register_chest(name, d)
 		def.on_blast = function() end
 		def.on_key_use = function(pos, player)
 			local secret = minetest.get_meta(pos):get_string("key_lock_secret")
+			if not player then return end
 			local itemstack = player:get_wielded_item()
 			local key_meta = itemstack:get_meta()
 
@@ -1927,6 +1929,7 @@ function default.register_chest(name, d)
 		end
 		def.on_skeleton_key_use = function(pos, player, newsecret)
 			local meta = minetest.get_meta(pos)
+			if not player then return end
 			local owner = meta:get_string("owner")
 			local pn = player:get_player_name()
 
@@ -1958,6 +1961,7 @@ function default.register_chest(name, d)
 			return inv:is_empty("main")
 		end
 		def.on_rightclick = function(pos, node, clicker)
+			if not clicker then return end
 			minetest.sound_play(def.sound_open, {gain = 0.3, pos = pos,
 					max_hear_distance = 10})
 			if not chest_lid_obstructed(pos) then
@@ -1982,15 +1986,18 @@ function default.register_chest(name, d)
 
 	def.on_metadata_inventory_move = function(pos, from_list, from_index,
 			to_list, to_index, count, player)
+		if not player then return end
 		minetest.log("action", player:get_player_name() ..
 			" moves stuff in chest at " .. minetest.pos_to_string(pos))
 	end
 	def.on_metadata_inventory_put = function(pos, listname, index, stack, player)
+		if not player then return end
 		minetest.log("action", player:get_player_name() ..
 			" moves " .. stack:get_name() ..
 			" to chest at " .. minetest.pos_to_string(pos))
 	end
 	def.on_metadata_inventory_take = function(pos, listname, index, stack, player)
+		if not player then return end
 		minetest.log("action", player:get_player_name() ..
 			" takes " .. stack:get_name() ..
 			" from chest at " .. minetest.pos_to_string(pos))
@@ -2137,18 +2144,21 @@ minetest.register_node("default:bookshelf", {
 		return 0
 	end,
 	on_metadata_inventory_move = function(pos, from_list, from_index, to_list, to_index, count, player)
+		if not player then return end
 		minetest.log("action", player:get_player_name() ..
 			" moves stuff in bookshelf at " .. minetest.pos_to_string(pos))
 		local meta = minetest.get_meta(pos)
 		meta:set_string("formspec", get_bookshelf_formspec(meta:get_inventory()))
 	end,
 	on_metadata_inventory_put = function(pos, listname, index, stack, player)
+		if not player then return end
 		minetest.log("action", player:get_player_name() ..
 			" moves stuff to bookshelf at " .. minetest.pos_to_string(pos))
 		local meta = minetest.get_meta(pos)
 		meta:set_string("formspec", get_bookshelf_formspec(meta:get_inventory()))
 	end,
 	on_metadata_inventory_take = function(pos, listname, index, stack, player)
+		if not player then return end
 		minetest.log("action", player:get_player_name() ..
 			" takes stuff from bookshelf at " .. minetest.pos_to_string(pos))
 		local meta = minetest.get_meta(pos)
@@ -2192,7 +2202,7 @@ local function register_sign(material, desc, def)
 		end,
 		on_receive_fields = function(pos, formname, fields, sender)
 			--print("Sign at "..minetest.pos_to_string(pos).." got "..dump(fields))
-			local player_name = sender:get_player_name()
+			local player_name = sender and sender:get_player_name() or ""
 			if minetest.is_protected(pos, player_name) then
 				minetest.record_protection_violation(pos, player_name)
 				return
