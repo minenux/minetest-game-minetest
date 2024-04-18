@@ -35,7 +35,7 @@ minetest.register_craft({
 	}
 })
 
--minetest.register_craft({
+minetest.register_craft({
 	output = 'default:wood',
 	recipe = {
 		{'default:bush_stem'},
