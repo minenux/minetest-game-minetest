@@ -1891,7 +1891,7 @@ function default.register_chest(name, d)
 			if clicker then
 				if not default.can_interact_with_node(clicker, pos) then return itemstack end
 			end
-			if not clicker return end
+			if not clicker then return end
 			minetest.sound_play(def.sound_open, {gain = 0.3,
 					pos = pos, max_hear_distance = 10})
 			if not chest_lid_obstructed(pos) then
