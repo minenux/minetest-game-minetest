@@ -24,12 +24,14 @@ end
 
 local N = function(s) return s end
 
-local modarmors = minetest.get_modpath("3d_armor")
-local modhbarm = minetest.get_modpath("hbarmor")
-local modhbhung = minetest.get_modpath("hbhunger")
+local modarmors = minetest.get_modpath("3d_armor") or false
+local modhbarm = minetest.get_modpath("hbarmor") or false
+local modhbhung = minetest.get_modpath("hbhunger") or false
 
-if (not armor) or (not armor.def) then
-	minetest.log("error", "[hbarmor] Outdated 3d_armor version. Please update your version of 3d_armor!")
+if modarmors then
+	if (not armor) or (not armor.def) then
+		minetest.log("error", "[hbarmor] Outdated 3d_armor version. Please update your version of 3d_armor!")
+	end
 end
 
 hb = {}
