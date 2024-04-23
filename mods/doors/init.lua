@@ -1,5 +1,6 @@
 
-local is_53 = minetest.has_feature("object_step_has_moveresult")
+local is_53 = minetest.has_feature("object_step_has_moveresult") or false
+local is_54 = minetest.has_feature("direct_velocity_on_players") or false
 
 -- our API object
 doors = {
@@ -128,7 +129,7 @@ minetest.register_node("doors:hidden", {
 	paramtype = "light",
 	paramtype2 = "facedir",
 	sunlight_propagates = true,
-	use_texture_alpha = "clip",
+	use_texture_alpha = (is_54 and "clip" or true),
 	-- has to be walkable for falling nodes to stop falling.
 	walkable = true,
 	pointable = false,
@@ -526,7 +527,7 @@ function doors.register(name, def)
 	def.paramtype = "light"
 	def.paramtype2 = "facedir"
 	def.sunlight_propagates = true
-	def.use_texture_alpha = def.use_texture_alpha or "clip"
+	def.use_texture_alpha = (is_54 and "clip" or true)
 	def.walkable = true
 	def.is_ground_content = false
 	def.buildable_to = false
@@ -737,7 +738,7 @@ function doors.register_trapdoor(name, def)
 	def.drawtype = "nodebox"
 	def.paramtype = "light"
 	def.paramtype2 = "facedir"
-	def.use_texture_alpha = def.use_texture_alpha or "clip"
+	def.use_texture_alpha = (is_54 and "clip" or true)
 	def.is_ground_content = false
 
 	if def.protected then

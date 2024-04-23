@@ -6,6 +6,7 @@
 ]]
 
 local S = farming.intllib
+local is_54 = minetest.has_feature("direct_velocity_on_players") or false
 
 -- garlic clove
 minetest.register_craftitem("farming:garlic_clove", {
@@ -45,7 +46,7 @@ minetest.register_node("farming:garlic_braid", {
 	inventory_image = "crops_garlic_braid.png",
 	wield_image = "crops_garlic_braid.png",
 	drawtype = "nodebox",
-	use_texture_alpha = "clip",
+	use_texture_alpha = (is_54 and "clip" or true),
 	paramtype = "light",
 	paramtype2 = "facedir",
 	tiles = {

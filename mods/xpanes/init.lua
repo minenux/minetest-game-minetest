@@ -2,7 +2,7 @@
 
 -- Load support for MT game translation.
 local S = minetest.get_translator("xpanes")
-
+local is_54 = minetest.has_feature("direct_velocity_on_players") or false
 
 local function is_pane(pos)
 	return minetest.get_item_group(minetest.get_node(pos).name, "pane") > 0
@@ -116,7 +116,7 @@ function xpanes.register_pane(name, def)
 		groups = flatgroups,
 		drop = "xpanes:" .. name .. "_flat",
 		sounds = def.sounds,
-		use_texture_alpha = def.use_texture_alpha or false,
+		use_texture_alpha = def.use_texture_alpha or (is_54 and "opaque" or false),
 		node_box = {
 			type = "fixed",
 			fixed = {{-1/2, -1/2, -1/32, 1/2, 1/2, 1/32}},
@@ -145,7 +145,7 @@ function xpanes.register_pane(name, def)
 		groups = groups,
 		drop = "xpanes:" .. name .. "_flat",
 		sounds = def.sounds,
-		use_texture_alpha = def.use_texture_alpha or false,
+		use_texture_alpha = def.use_texture_alpha or (is_54 and "opaque" or false),
 		node_box = {
 			type = "connected",
 			fixed = {{-1/32, -1/2, -1/32, 1/32, 1/2, 1/32}},
