@@ -69,6 +69,7 @@ local function rangelim(value, lower, upper)
 	return math.min(math.max(value, lower), upper)
 end
 
+local is_older = minetest.has_feature("no_chat_message_prediction")
 local os_time_0 = os.time()
 local t_offset = math.random(0, 300000)
 
@@ -88,14 +89,16 @@ local function update_clouds()
 	local n_speedz = nobj_speedz:get_2d({x = time, y = 0})
 
 	for _, player in ipairs(minetest.get_connected_players()) do
-		local humid = minetest.get_humidity(player:get_pos())
-		player:set_clouds({
-			density = rangelim(humid / 100, 0.25, 1.0) * n_density,
-			thickness = math.max(math.floor(
-				rangelim(32 * humid / 100, 8, 32) * n_thickness
-				), 1),
-			speed = {x = n_speedx * 4, z = n_speedz * 4},
-		})
+		local humid = minetest.get_humidity(player:get_pos()) or 50
+		if is_older then
+			player:set_clouds({
+				density = rangelim(humid / 100, 0.25, 1.0) * n_density,
+				thickness = math.max(math.floor(
+					rangelim(32 * humid / 100, 8, 32) * n_thickness
+					), 1),
+				speed = {x = n_speedx * 4, z = n_speedz * 4},
+			})
+		end
 	end
 end
 
