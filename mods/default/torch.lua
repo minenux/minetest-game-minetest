@@ -47,6 +47,7 @@ minetest.register_node("default:torch", {
 		    name = "default_torch_on_floor_animated.png",
 		    animation = {type = "vertical_frames", aspect_w = 16, aspect_h = 16, length = 3.3}
 	}},
+	use_texture_alpha = (is_54 and "clip" or true),
 	paramtype = "light",
 	paramtype2 = "wallmounted",
 	sunlight_propagates = true,
