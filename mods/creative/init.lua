@@ -185,7 +185,7 @@ function creative.update_creative_inventory(player_name, tab_content)
 	local lang = minetest.settings:get("language") or "en"
 	local player_info = minetest.get_player_information(player_name)
 
-	if is_53 then 
+	if creative.is_53 then 
 		if player_info and player_info.lang_code ~= "" then
 			lang = player_info.lang_code
 		end
