@@ -1,6 +1,7 @@
 local workbench = {}
 local nodes = {}
 
+local is_54 = minetest.has_feature("direct_velocity_on_players") or false
 screwdriver = screwdriver or {}
 local min, ceil = math.min, math.ceil
 local S = xdecor.S
@@ -343,7 +344,7 @@ for i = 1, #nodes do
 			drawtype = "nodebox",
 			sounds = def.sounds,
 			tiles = tiles,
-			use_texture_alpha = def.use_texture_alpha,
+			use_texture_alpha = def.use_texture_alpha or (is_54 and "clip" or true),
 			groups = groups,
 			-- `unpack` has been changed to `table.unpack` in newest Lua versions
 			node_box = xdecor.pixelbox(16, {unpack(d, 3)}),

@@ -3,6 +3,7 @@ local S = farming.intllib
 
 --= Helpers
 
+local is_54 = minetest.has_feature("direct_velocity_on_players") or false
 local eth = minetest.get_modpath("ethereal")
 local alias = function(orig, new)
 	minetest.register_alias(orig, new)
@@ -36,6 +37,7 @@ minetest.override_item("default:apple", {
 		"apple_side.png",
 		"apple_side.png",
 	},
+	use_texture_alpha = (is_54 and "clip" or false),
 	groups = {food_apple = 1, fleshy = 3, dig_immediate = 3, flammable = 2,
 		leafdecay = 3, leafdecay_drop = 1}
 })

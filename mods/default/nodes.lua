@@ -208,6 +208,11 @@ default:cloud
 -- Stone
 --
 
+local is_54 = minetest.has_feature("direct_velocity_on_players") or false
+local alpha_use_texture_alpha = true
+
+if is_54 then alpha_use_texture_alpha = "blend" end
+
 minetest.register_node("default:stone", {
 	description = "Stone",
 	tiles = {"default_stone.png"},
@@ -1508,6 +1513,7 @@ minetest.register_node("default:water_source", {
 		},
 	},
 	alpha = 160,
+	use_texture_alpha = alpha_use_texture_alpha,
 	paramtype = "light",
 	walkable = false,
 	pointable = false,
@@ -1552,6 +1558,7 @@ minetest.register_node("default:water_flowing", {
 		},
 	},
 	alpha = 160,
+	use_texture_alpha = alpha_use_texture_alpha,
 	paramtype = "light",
 	paramtype2 = "flowingliquid",
 	walkable = false,
@@ -1599,6 +1606,7 @@ minetest.register_node("default:river_water_source", {
 		},
 	},
 	alpha = 160,
+	use_texture_alpha = alpha_use_texture_alpha,
 	paramtype = "light",
 	walkable = false,
 	pointable = false,
@@ -1645,6 +1653,7 @@ minetest.register_node("default:river_water_flowing", {
 		},
 	},
 	alpha = 160,
+	use_texture_alpha = alpha_use_texture_alpha,
 	paramtype = "light",
 	paramtype2 = "flowingliquid",
 	walkable = false,
@@ -2185,6 +2194,7 @@ local function register_sign(material, desc, def)
 		sunlight_propagates = true,
 		is_ground_content = false,
 		walkable = false,
+		use_texture_alpha = (is_54 and "opaque" or alpha_use_texture_alpha),
 		node_box = {
 			type = "wallmounted",
 			wall_top    = {-0.4375, 0.4375, -0.3125, 0.4375, 0.5, 0.3125},
@@ -2326,6 +2336,7 @@ minetest.register_node("default:glass", {
 	description = "Glass",
 	drawtype = "glasslike_framed_optional",
 	tiles = {"default_glass.png", "default_glass_detail.png"},
+	use_texture_alpha = (is_54 and "clip" or alpha_use_texture_alpha),
 	paramtype = "light",
 	paramtype2 = "glasslikeliquidlevel",
 	sunlight_propagates = true,
@@ -2338,6 +2349,7 @@ minetest.register_node("default:obsidian_glass", {
 	description = "Obsidian Glass",
 	drawtype = "glasslike_framed_optional",
 	tiles = {"default_obsidian_glass.png", "default_obsidian_glass_detail.png"},
+	use_texture_alpha = (is_54 and "clip" or alpha_use_texture_alpha),
 	paramtype = "light",
 	paramtype2 = "glasslikeliquidlevel",
 	is_ground_content = false,
@@ -2375,6 +2387,7 @@ minetest.register_node("default:mese_post_light", {
 	tiles = {"default_mese_post_light_top.png", "default_mese_post_light_top.png",
 		"default_mese_post_light_side_dark.png", "default_mese_post_light_side_dark.png",
 		"default_mese_post_light_side.png", "default_mese_post_light_side.png"},
+	use_texture_alpha = (is_54 and "clip" or alpha_use_texture_alpha),
 	wield_image = "default_mese_post_light_side.png",
 	drawtype = "nodebox",
 	node_box = {

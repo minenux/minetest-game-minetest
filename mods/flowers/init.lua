@@ -6,6 +6,7 @@
 
 flowers = {}
 
+local is_54 = minetest.has_feature("direct_velocity_on_players") or false
 
 -- Map Generation
 
@@ -271,6 +272,7 @@ minetest.register_node("flowers:waterlily", {
 	tiles = {"flowers_waterlily.png", "flowers_waterlily_bottom.png"},
 	inventory_image = "flowers_waterlily.png",
 	wield_image = "flowers_waterlily.png",
+	use_texture_alpha = (is_54 and "clip" or true),
 	liquids_pointable = true,
 	walkable = false,
 	buildable_to = true,

@@ -1,4 +1,6 @@
 
+local is_54 = minetest.has_feature("direct_velocity_on_players") or false
+
 -- wool sounds
 function default.node_sound_wool_defaults(table)
 
@@ -24,7 +26,7 @@ stairs = {
 }
 
 -- add new 5.x snow sounds to 0.4.x client
---if not minetest.has_feature("object_use_texture_alpha") then
+if not stairs.node_sound_snow_defaults then
 	function stairs.node_sound_snow_defaults(table)
 
 		table = table or {}
@@ -35,7 +37,7 @@ stairs = {
 
 		return table
 	end
---end
+end
 
 
 -- cache creative
@@ -136,8 +138,9 @@ local function get_node_vars(nodename)
 	if def then
 		return def.light_source, def.use_texture_alpha, def.sunlight_propagates
 	end
+	if is_54 then return 0, "clip", nil end
 
-	return nil, nil, nil
+	return false, true, nil
 end
 
 
