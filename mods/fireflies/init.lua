@@ -38,8 +38,9 @@ minetest.register_node("fireflies:firefly", {
 	light_source = 6,
 	floodable = true,
 	on_place = function(itemstack, placer, pointed_thing)
-		if not player and not player:is_player() then return itemstack end
-		local player_name = placer:get_player_name()
+		if not placer then return itemstack end
+		if not placer:is_player() then return itemstack end
+		local player_name = placer:get_player_name() or ""
 		local pos = pointed_thing.above
 
 		if not minetest.is_protected(pos, player_name) and
